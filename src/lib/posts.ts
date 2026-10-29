@@ -39,11 +39,17 @@ function firstImage(body: string): string | undefined {
   return body.match(/!\[[^\]]*\]\(\s*(\S+?)\s*\)/)?.[1];
 }
 export function countWords(body: string): number {
-  return body.trim().split(/\s+/).filter(Boolean).length;
+  if (!body) return 0;
+  const cjkMatches = body.match(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g);
+  const cjkCount = cjkMatches ? cjkMatches.length : 0;
+  const nonCjk = body.replace(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g, " ");
+  const westernCount = nonCjk.trim().split(/\s+/).filter(Boolean).length;
+  return cjkCount + westernCount;
 }
 function readingMinutes(body: string, lang: string): number {
-  const rate = lang === "es" ? 180 : 200;
-  return Math.max(1, Math.ceil(countWords(body) / rate));
+  const words = countWords(body);
+  const rate = lang === "zh" ? 350 : lang === "es" ? 180 : 200;
+  return Math.max(1, Math.ceil(words / rate));
 }
 export function getPostId(post: CollectionEntry<"posts">): string {
   const prefix = `${post.data.lang.toLowerCase()}/`;

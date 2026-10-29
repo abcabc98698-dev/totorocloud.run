@@ -148,10 +148,26 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-.right-sidebar {
   position: sticky;
   top: 84px;
+}
+.left-sidebar {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.left-sidebar::-webkit-scrollbar {
+  display: none;
+}
+.right-sidebar {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.right-sidebar::-webkit-scrollbar {
+  display: none;
 }
 .card {
   background: var(--card);

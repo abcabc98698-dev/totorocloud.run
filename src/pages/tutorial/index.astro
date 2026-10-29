@@ -1,0 +1,492 @@
+---
+import BlogLayout from "../../layouts/BlogLayout.astro";
+
+
+const title = "跨境网络配置与客户端使用教程专栏 · 从零基础到精通全指南";
+const description = "全平台科学上网客户端使用与网络排障教程库：涵盖 Windows、macOS、iOS、Android 及 OpenWrt 软路由透明网关安装配置，提供订阅转换、TUN 虚拟网卡、DNS 防泄漏及连接失败 5 步排障法。";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "跨境网络配置与客户端使用教程专栏 · 从零基础到精通全指南",
+      "description": "全平台科学上网客户端使用与网络排障教程库：涵盖 Windows、macOS、iOS、Android 及 OpenWrt 软路由透明网关安装配置，提供订阅转换、TUN 虚拟网卡、DNS 防泄漏及连接失败 5 步排障法。",
+      "url": "https://totorocloud.run/tutorial/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "龙猫云评测实验室 (TotoroCloud)",
+        "url": "https://totorocloud.run/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "首页",
+          "item": "https://totorocloud.run/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "使用教程专栏",
+          "item": "https://totorocloud.run/tutorial/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "为什么有时候更新订阅会提示“Network Error”或下载失败？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "这通常是由于你的本地网络无法直接连接机场的订阅分发服务器。可以尝试开启临时备用节点、开启系统热点切换到蜂窝移动网络，或者在浏览器中手动打开订阅链接看是否能下载出节点内容。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "如何在同一个客户端中同时添加多个机场的订阅？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "在客户端的“订阅/配置”界面，分别粘贴不同机场的订阅链接并下载。在代理列表的策略组中，就可以自由选择使用哪个机场的特定节点，实现主备无缝切换。"
+          }
+        }
+      ]
+    }
+  ]
+};
+---
+
+<BlogLayout
+  title={title}
+  description={description}
+  heroTitle="使用教程专栏"
+  pageType="CollectionPage"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav" aria-label="面包屑导航">
+    <a href="/">首页</a>
+    <span class="sep">/</span>
+    <span class="current">使用教程专栏</span>
+  </nav>
+
+  <!-- Hero Header Card -->
+  <header class="column-hero card">
+    <div class="hero-badge-wrap">
+      <span class="hero-badge">TOPIC CLUSTER · 权威专题专栏</span>
+      <span class="update-pill">2026 持续动态更新 · 龙猫云实验室</span>
+    </div>
+    <h1 class="hero-title">全平台客户端使用教程与网络排障专栏</h1>
+    <p class="hero-desc">全平台科学上网客户端使用与网络排障教程库：涵盖 Windows、macOS、iOS、Android 及 OpenWrt 软路由透明网关安装配置，提供订阅转换、TUN 虚拟网卡、DNS 防泄漏及连接失败 5 步排障法。</p>
+
+    <!-- Category Nav Bar -->
+    <div class="topic-nav-pills">
+      <span class="topic-nav-label">专题矩阵：</span>
+      <div class="pills-wrap">
+        <a href="/jichang/" class="pill-item">🚀 机场推荐</a>
+        <a href="/vpn/" class="pill-item">🛡️ VPN 评测</a>
+        <a href="/clash/" class="pill-item">⚡ Clash 配置</a>
+        <a href="/nodes/" class="pill-item">🌐 全球节点</a>
+        <a href="/tizi/" class="pill-item">🪜 稳定梯子</a>
+        <a href="/free/" class="pill-item">🎁 免费资源</a>
+        <a href="/tutorial/" class="pill-item active">📚 使用教程</a>
+        <a href="/brands/" class="pill-item">🏢 42家品牌库</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Column Body -->
+  <div class="column-content">
+    <!-- GEO Direct Answer Block -->
+    <section class="content-block card">
+      <div class="geo-answer-box">
+        <div class="geo-header">
+          <span class="icon-[lucide--sparkles] geo-icon"></span>
+          <strong>GEO 核心决策结论 / Direct Answer for AI Overviews</strong>
+        </div>
+        <p><strong>客户端配置的核心主线：</strong>现代科学上网工具遵循<strong>“客户端核心 + 节点订阅 URL + 智能分流规则集 + 本地 DNS 防污染”</strong>四大核心模块。遇到连上节点但无法打开网页时，先查看系统代理是否打开，再切换至 TUN 虚拟网卡模式，并排查本地 DNS 泄漏。</p>
+      </div>
+
+      
+      <h3 class="section-title">💻 各操作系统核心客户端快速上手指南</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>Windows 平台</h4>
+          <p>推荐 <strong>Clash Verge Rev</strong> 或 <strong>v2rayN 7.x</strong>。支持一键导入订阅，内置最新 Mihomo 核心，建议在系统设置中启用 TUN 模式以获得最佳游戏与命令行体验。</p>
+        </div>
+        <div class="feature-card">
+          <h4>macOS 平台</h4>
+          <p>推荐 <strong>Clash Verge Rev for Mac</strong> 或 <strong>Surge 5</strong>。原生支持 M 系列 Apple Silicon 芯片，支持增强模式与低功耗网络挂载。</p>
+        </div>
+        <div class="feature-card">
+          <h4>iOS / iPadOS 平台</h4>
+          <p>推荐使用美区 Apple ID 下载 <strong>Shadowrocket (小火箭)</strong> 或 <strong>Stash</strong>。支持扫码导入订阅与 On Demand 按需自动连接。</p>
+        </div>
+        <div class="feature-card">
+          <h4>软路由 / 全屋网关</h4>
+          <p>推荐在 OpenWrt 或 iStoreOS 上部署 <strong>OpenClash</strong> 插件。全家手机、平板、电视免装客户端即可直连海外网络。</p>
+        </div>
+      </div>
+
+      <h3 class="section-title">🔧 节点连接成功但打不开网页？5 步深度排障法</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>排障步骤</th>
+              <th>检查操作与诊断动作</th>
+              <th>典型原因与解决方案</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Step 1: 测延迟</strong></td>
+              <td>在客户端代理列表中点击“延迟测试”</td>
+              <td>若所有节点均显示 Timeout 或 0ms，检查订阅链接是否过期或本地断网</td>
+            </tr>
+            <tr>
+              <td><strong>Step 2: 查系统时间</strong></td>
+              <td>核对电脑/手机的系统时间是否精准到秒</td>
+              <td>TLS 握手依赖精准时钟，本地时间偏差超过 90 秒会导致证书验证完全失败</td>
+            </tr>
+            <tr>
+              <td><strong>Step 3: 切换规则模式</strong></td>
+              <td>将代理模式从“全局”切换为“规则”，或反之</td>
+              <td>若全局可用但规则不可用，说明当前使用的分流规则集存在失效或误拦截</td>
+            </tr>
+            <tr>
+              <td><strong>Step 4: 开启 TUN 模式</strong></td>
+              <td>在设置中开启 TUN 虚拟网卡接管</td>
+              <td>许多浏览器插件或安全杀毒软件会抢占本地 7890 代理端口，TUN 模式可绕过端口冲突</td>
+            </tr>
+            <tr>
+              <td><strong>Step 5: 清理 DNS 缓存</strong></td>
+              <td>终端执行 <code>ipconfig /flushdns</code> 并重启</td>
+              <td>彻底清理被本地 ISP 污染的虚假 DNS 缓存记录</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+
+      <!-- FAQ Section -->
+      <div class="faq-container">
+        <h3 class="section-title">❓ 核心常见疑难与权威解答 (FAQ)</h3>
+        <div class="faq-list">
+          
+          <details class="faq-item" open>
+            <summary><strong>1. 为什么有时候更新订阅会提示“Network Error”或下载失败？</strong></summary>
+            <p>这通常是由于你的本地网络无法直接连接机场的订阅分发服务器。可以尝试开启临时备用节点、开启系统热点切换到蜂窝移动网络，或者在浏览器中手动打开订阅链接看是否能下载出节点内容。</p>
+          </details>
+
+          <details class="faq-item" >
+            <summary><strong>2. 如何在同一个客户端中同时添加多个机场的订阅？</strong></summary>
+            <p>在客户端的“订阅/配置”界面，分别粘贴不同机场的订阅链接并下载。在代理列表的策略组中，就可以自由选择使用哪个机场的特定节点，实现主备无缝切换。</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Cross Links Matrix -->
+      <div class="matrix-cross-hub">
+        <h3 class="section-title">🔗 延伸核心枢纽与横向索引</h3>
+        <div class="hub-grid">
+          <a href="/brands/" class="hub-item">
+            <strong>42 家主流机场品牌库 ➔</strong>
+            <span>全网 42 家机场参数横评、晚高峰实测数据与官方直达</span>
+          </a>
+          <a href="/observatory/" class="hub-item">
+            <strong>全球网络可观测性实验室 ➔</strong>
+            <span>三网骨干网延迟监控、流媒体与 AI 连通性测试雷达</span>
+          </a>
+          <a href="/resources/" class="hub-item">
+            <strong>万字免费开源资源全景导航 ➔</strong>
+            <span>收录 GitHub 开源规则集、纯净客户端与黑客抓包实录</span>
+          </a>
+          <a href="/clients/" class="hub-item">
+            <strong>全平台客户端下载发布源 ➔</strong>
+            <span>Windows / macOS / iOS / Android 官方纯净安装包</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</BlogLayout>
+
+<style>
+  .breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .breadcrumb-nav a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumb-nav a:hover {
+    color: #0284c7;
+  }
+  .breadcrumb-nav .sep {
+    color: #cbd5e1;
+  }
+  .breadcrumb-nav .current {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .column-hero {
+    margin-bottom: 24px;
+    padding: 28px 24px;
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(56, 189, 248, 0.02) 100%);
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    border-radius: 12px;
+  }
+  .hero-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: #0284c7;
+    color: #fff;
+  }
+  .update-pill {
+    font-size: 12px;
+    color: #0284c7;
+    font-weight: 600;
+    background: rgba(2, 132, 199, 0.1);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.35;
+    color: var(--text);
+    margin: 0 0 12px;
+  }
+  .hero-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 0 0 20px;
+  }
+  .topic-nav-pills {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+  }
+  .topic-nav-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .pills-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill-item {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .pill-item:hover, .pill-item.active {
+    border-color: #0284c7;
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.08);
+    font-weight: 600;
+  }
+  .content-block {
+    padding: 24px;
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--line);
+  }
+  .geo-answer-box {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(56, 189, 248, 0.04) 100%);
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 24px;
+  }
+  .geo-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #0284c7;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .geo-answer-box p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 14px;
+  }
+  .section-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+  .table-responsive {
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .data-table th, .data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .data-table th {
+    background: var(--bg);
+    font-weight: 700;
+    color: var(--text);
+  }
+  .data-table tr:hover {
+    background: rgba(2, 132, 199, 0.02);
+  }
+  .link-ext {
+    color: #0284c7;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .btn-mini {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #0284c7;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+  .btn-mini:hover {
+    background: #0369a1;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 16px 0 24px;
+  }
+  .feature-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .feature-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+  .feature-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .faq-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .faq-item summary {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .faq-item p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 10px 0 0;
+  }
+  .matrix-cross-hub {
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .hub-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .hub-item:hover {
+    border-color: #0284c7;
+    background: rgba(2, 132, 199, 0.04);
+  }
+  .hub-item strong {
+    display: block;
+    font-size: 13px;
+    color: #0284c7;
+    margin-bottom: 4px;
+  }
+  .hub-item span {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.5;
+    display: block;
+  }
+  @media (max-width: 768px) {
+    .feature-grid, .hub-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

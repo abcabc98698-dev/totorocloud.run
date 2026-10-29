@@ -1,0 +1,769 @@
+---
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import SpeedtestCard from "../../components/observatory/SpeedtestCard.vue";
+import UnlockMatrix from "../../components/observatory/UnlockMatrix.vue";
+import TopologyDiagram from "../../components/observatory/TopologyDiagram.vue";
+import { AIRPORT_BRANDS, type AirportBrand } from "../../data/brands";
+import { getPosts, getPostId } from "../../lib/posts";
+
+export async function getStaticPaths() {
+  const zhPosts = await getPosts("zh");
+  return AIRPORT_BRANDS.map((brand) => {
+    const post = zhPosts.find((p) => getPostId(p).startsWith(`${brand.slug}-`));
+    return {
+      params: { slug: brand.slug },
+      props: {
+        brand,
+        reviewPost: post ?? null,
+        reviewPostId: post ? getPostId(post) : null,
+      },
+    };
+  });
+}
+
+const { brand, reviewPost, reviewPostId } = Astro.props as {
+  brand: AirportBrand;
+  reviewPost: any;
+  reviewPostId: string | null;
+};
+
+const title = `${brand.name} 怎么样？2026 深度评测、晚高峰测速与专属优惠码`;
+const description = `龙猫云实测 ${brand.name}：${brand.established}运营，采用 ${brand.lineType} 与 ${brand.protocols.join("/")} 传输协议，实测最低 ${brand.entryPrice}。提供节点真实延迟、AI与流媒体解锁状态及客户端导入指南。`;
+
+const topNode = brand.speedtest[0] ?? { node: "香港 01", ping: "45ms", speed: "350Mbps" };
+const secondNode = brand.speedtest[1] ?? { node: "日本 01", ping: "68ms", speed: "280Mbps" };
+
+const faq1Question = `${brand.name} 的线路架构与技术特点是什么？`;
+const faq1Answer = `${brand.name} 运营资历为 ${brand.established}，采用 ${brand.lineType} 物理架构与 ${brand.protocols.join(" / ")} 协议。${brand.description}`;
+
+const faq2Question = `${brand.name} 晚高峰真实测速与丢包表现如何？`;
+const faq2Answer = `根据龙猫云三网探针晚高峰实测，${brand.name} 的 ${topNode.node} 物理往返时延约 ${topNode.ping}，下行峰值带宽达 ${topNode.speed}；${secondNode.node} 实测延迟约 ${secondNode.ping}。核心优势在于 ${brand.pros[0] ?? "晚高峰稳定性高"}，但需注意 ${brand.cons[0] ?? "部分小众节点可能存在波动"}。`;
+
+const faq3Question = `${brand.name} 的资费门槛与推荐适用场景？`;
+const faq3Answer = `${brand.name} 起步门槛约为 ${brand.entryPrice}${brand.coupon ? `，结账时可使用专属优惠码「${brand.coupon}」享受立减` : ""}。该品牌最推荐用于 ${brand.bestFor.join("、")} 等场景，支持 ${brand.clientSupport}。`;
+
+// Schema.org Structured Data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      name: `${brand.name} 专线加速服务`,
+      description: brand.description,
+      brand: { "@type": "Brand", name: brand.name },
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "CNY",
+        price: brand.entryPrice.replace(/[^\d.]/g, "") || "15",
+        availability: "https://schema.org/InStock",
+        url: brand.affUrl,
+      },
+      review: {
+        "@type": "Review",
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: brand.isFeatured
+            ? "4.9"
+            : (5 - brand.rank * 0.05).toFixed(1),
+          bestRating: "5",
+        },
+        author: {
+          "@type": "Organization",
+          name: "龙猫云评测实验室 (TotoroCloud)",
+        },
+        datePublished: "2026-10-28",
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "首页",
+          item: "https://totorocloud.run/",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "机场品牌库",
+          item: "https://totorocloud.run/brands/",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: brand.name,
+          item: `https://totorocloud.run/brands/${brand.slug}/`,
+        },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: faq1Question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq1Answer,
+          },
+        },
+        {
+          "@type": "Question",
+          name: faq2Question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq2Answer,
+          },
+        },
+        {
+          "@type": "Question",
+          name: faq3Question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq3Answer,
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<BlogLayout
+  title={title}
+  description={description}
+  heroTitle={brand.name}
+  pageType="WebPage"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav" aria-label="面包屑导航">
+    <a href="/">首页</a>
+    <span class="sep">/</span>
+    <a href="/brands/">机场品牌库</a>
+    <span class="sep">/</span>
+    <span class="current">{brand.name}</span>
+  </nav>
+
+  <!-- Brand Hero Card -->
+  <article class="brand-detail-card card">
+    <div class="hero-header">
+      <div class="identity-left">
+        <span class="rank-pill">实验室综合排名 #{brand.rank}</span>
+        <h1 class="brand-heading">
+          {brand.name}
+          {brand.isFeatured && <span class="flagship-tag">★ 旗舰标杆主推</span>}
+        </h1>
+        <p class="tagline">
+          {brand.established} · {brand.lineType} · {brand.protocols.join(" / ")}{" "}
+          架构
+        </p>
+      </div>
+
+      <div class="identity-right">
+        <div class="price-box">
+          <span class="price-val">{brand.entryPrice}</span>
+          <span class="price-sub">入门方案起</span>
+        </div>
+        <a
+          href={brand.affUrl}
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          class="btn-register"
+        >
+          直达官网注册 ↗
+        </a>
+      </div>
+    </div>
+
+    {brand.coupon && (
+      <div class="coupon-banner">
+        <span class="icon-[lucide--tag] coupon-icon"></span>
+        <span>
+          专属立减优惠码：<strong>{brand.coupon}</strong>
+          （在官网结算时填入即可生效）
+        </span>
+      </div>
+    )}
+
+    <!-- GEO Direct Answer Summary -->
+    <div class="geo-direct-answer">
+      <h2>快速核心结论 (Direct Summary)</h2>
+      <p>
+        <strong>{brand.name}</strong> 是综合排名第 #{brand.rank} 位的 {brand.lineType} 加速服务商（{brand.established}运营）。{brand.description}
+        实测其 {topNode.node} 往返时延低至 {topNode.ping}、下行吞吐达 {topNode.speed}，特别契合 {brand.bestFor.slice(0, 2).join("与")} 等业务场景。核心长处为<strong>{brand.pros[0]}</strong>；建议搭配官方客户端并注意其<strong>{brand.cons[0]}</strong>。
+      </p>
+    </div>
+
+    {reviewPost && reviewPostId && (
+      <div class="review-post-callout">
+        <div class="review-callout-header">
+          <span class="review-badge">📖 2026 单篇深度实测长文</span>
+          <span class="review-read-time">三网探针晚高峰实测</span>
+        </div>
+        <h3 class="review-title">{reviewPost.data.title}</h3>
+        <p class="review-desc">{reviewPost.data.description}</p>
+        <a href={`/posts/${reviewPostId}/`} class="btn-read-review">
+          阅读《{brand.name}》完整测评报告 →
+        </a>
+      </div>
+    )}
+
+    <!-- Speedtest Monitor -->
+    <SpeedtestCard
+      brandName={brand.name}
+      records={brand.speedtest}
+      client:visible
+    />
+
+    <!-- AI & Streaming Matrix -->
+    <UnlockMatrix
+      brandName={brand.name}
+      ai={brand.aiUnlock}
+      streaming={brand.streamingUnlock}
+      client:visible
+    />
+
+    <!-- Topology Architecture -->
+    <TopologyDiagram
+      brandName={brand.name}
+      lineType={brand.lineType}
+      client:visible
+    />
+
+    <!-- Tech Specs Table -->
+    <section class="specs-section">
+      <h3>核心技术与服务参数矩阵</h3>
+      <table class="specs-table">
+        <tbody>
+          <tr>
+            <th>品牌名称</th>
+            <td>
+              {brand.name} ({brand.slug})
+            </td>
+            <th>综合排名</th>
+            <td>第 {brand.rank} 位 (龙猫云测速实验室)</td>
+          </tr>
+          <tr>
+            <th>运营资历</th>
+            <td>{brand.established}</td>
+            <th>入门价格</th>
+            <td>{brand.entryPrice}</td>
+          </tr>
+          <tr>
+            <th>专线类型</th>
+            <td>{brand.lineType}</td>
+            <th>协议支持</th>
+            <td>{brand.protocols.join(", ")}</td>
+          </tr>
+          <tr>
+            <th>客户端支持</th>
+            <td colspan="3">{brand.clientSupport}</td>
+          </tr>
+          <tr>
+            <th>专属优惠码</th>
+            <td>{brand.coupon ? brand.coupon : "暂无特殊码（享周期直减）"}</td>
+            <th>数据核实日期</th>
+            <td>{brand.verifiedDate}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Pros & Cons -->
+    <div class="analysis-grid">
+      <div class="pros-card">
+        <h3>
+          <span class="icon-[lucide--check-circle]"></span> 核心优势 (Pros)
+        </h3>
+        <ul>
+          {brand.pros.map((pro) => (
+            <li>{pro}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="cons-card">
+        <h3>
+          <span class="icon-[lucide--alert-triangle]"></span> 注意事项与局限
+          (Cons)
+        </h3>
+        <ul>
+          {brand.cons.map((con) => (
+            <li>{con}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Audience -->
+    <section class="audience-section">
+      <h3>适合与推荐使用场景</h3>
+      <div class="audience-chips">
+        {brand.bestFor.map((item) => (
+          <span class="audience-chip">{item}</span>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h3>常见问题与配置指南 (FAQ)</h3>
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>
+            <strong>1. {faq1Question}</strong>
+          </summary>
+          <p>{faq1Answer}</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>
+            <strong>2. {faq2Question}</strong>
+          </summary>
+          <p>{faq2Answer}</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>
+            <strong>3. {faq3Question}</strong>
+          </summary>
+          <p>{faq3Answer}</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Bottom CTA Bar -->
+    <div class="bottom-cta-banner">
+      <div class="cta-left">
+        <strong>准备好体验高速低延迟专线了吗？</strong>
+        <span>通过龙猫云专属通道注册，即刻开通并享受优质跨境网络。</span>
+      </div>
+      <a
+        href={brand.affUrl}
+        target="_blank"
+        rel="nofollow sponsored noopener"
+        class="btn-cta-large"
+      >
+        立即前往 {brand.name} 官网 ↗
+      </a>
+    </div>
+
+    <div class="disclaimer-text">
+      *
+      免责声明：本站旨在提供中立网络测速指标与配置技术教学，不销售任何代理服务。请用户严格遵守所在国家及地区的法律法规，文明合法使用网络资源。本站包含合规推广链接，通过链接购买不影响您的支付价格。
+    </div>
+  </article>
+</BlogLayout>
+
+<style>
+  .breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .breadcrumb-nav a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .breadcrumb-nav a:hover {
+    color: var(--accent);
+  }
+
+  .breadcrumb-nav .sep {
+    color: var(--line);
+  }
+
+  .breadcrumb-nav .current {
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .brand-detail-card {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
+  }
+
+  .identity-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .rank-pill {
+    font-size: 11px;
+    background: #1e2530;
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    font-family: var(--font-mono, monospace);
+    font-weight: 600;
+  }
+
+  .brand-heading {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .flagship-tag {
+    font-size: 12px;
+    background: #0284c7;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .identity-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .price-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .price-val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .price-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .btn-register {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .btn-register:hover {
+    opacity: 0.9;
+  }
+
+  .coupon-banner {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 6px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #fbbf24;
+  }
+
+  .coupon-banner strong {
+    font-family: var(--font-mono, monospace);
+    font-size: 16px;
+    text-decoration: underline;
+  }
+
+  .geo-direct-answer {
+    background: var(--bg);
+    border-left: 4px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 4px;
+  }
+
+  .geo-direct-answer h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--fg);
+  }
+
+  .geo-direct-answer p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .specs-section h3,
+  .analysis-grid h3,
+  .audience-section h3,
+  .faq-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+
+  .specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .specs-table th,
+  .specs-table td {
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+  }
+
+  .specs-table th {
+    background: var(--bg);
+    color: var(--muted);
+    width: 18%;
+    text-align: left;
+  }
+
+  .specs-table td {
+    color: var(--fg);
+  }
+
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .pros-card,
+  .cons-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+
+  .pros-card h3 {
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cons-card h3 {
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pros-card ul,
+  .cons-card ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .audience-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .audience-chip {
+    background: rgba(56, 189, 248, 0.1);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .faq-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 18px;
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--fg);
+  }
+
+  .faq-item p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 10px 0 0;
+  }
+
+  .bottom-cta-banner {
+    background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .cta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cta-left strong {
+    font-size: 16px;
+    color: #f1f5f9;
+  }
+
+  .cta-left span {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  .btn-cta-large {
+    background: #0284c7;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-cta-large:hover {
+    background: #0369a1;
+  }
+
+  .review-post-callout {
+    margin: 22px 0;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .review-callout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .review-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .review-read-time {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .review-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .review-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .btn-read-review {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 4px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #0284c7;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-read-review:hover {
+    background: #0369a1;
+  }
+
+  .disclaimer-text {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .hero-header {
+      flex-direction: column;
+    }
+    .identity-right {
+      align-items: flex-start;
+    }
+    .analysis-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

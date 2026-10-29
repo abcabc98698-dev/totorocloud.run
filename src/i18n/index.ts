@@ -1,17 +1,21 @@
 import settings from "../site.config.json" with { type: "json" };
-import es from "./es.json" with { type: "json" };
+import zh from "./zh.json" with { type: "json" };
 import en from "./en.json" with { type: "json" };
+import es from "./es.json" with { type: "json" };
 
-export const languages = ["en", "es"] as const;
+export const languages = ["zh", "en", "es"] as const;
 export type Language = (typeof languages)[number];
-export type TranslationKey = keyof typeof es;
+export type TranslationKey = keyof typeof zh;
 type Dictionary = Record<TranslationKey, string>;
-export const dictionaries = { es, en } satisfies Record<Language, Dictionary>;
+export const dictionaries = { zh, en, es } satisfies Record<
+  Language,
+  Dictionary
+>;
 
 // The default language is served at the root; others live under /<lang>/.
-export const defaultLanguage: Language = "en";
-export const locales = { es: "es-ES", en: "en-US" } as const;
-export const ogLocales = { es: "es_ES", en: "en_US" } as const;
+export const defaultLanguage: Language = "zh";
+export const locales = { zh: "zh-CN", en: "en-US", es: "es-ES" } as const;
+export const ogLocales = { zh: "zh_CN", en: "en_US", es: "es_ES" } as const;
 
 export const isLanguage = (value: unknown): value is Language =>
   languages.some((language) => language === value);
@@ -22,14 +26,14 @@ export function getLanguage(value?: string): Language {
 export function getLanguageFromPath(pathname: string): Language {
   return getLanguage(pathname.split("/")[1]);
 }
-// "/en/posts/" -> "/posts/"
+// "/es/posts/" -> "/posts/" for non-default, unchaged for default
 export function stripLanguage(pathname: string): string {
   const [, first, ...rest] = pathname.split("/");
   return isLanguage(first) && first !== defaultLanguage
     ? `/${rest.join("/")}`
     : pathname;
 }
-// "/posts/" -> "/en/posts/" for English, unchanged for the default language.
+// "/posts/" -> "/es/posts/" for non-default languages, unchanged for the default language.
 export function localizePath(lang: Language, path: string): string {
   if (!path.startsWith("/") || lang === defaultLanguage) return path;
   return `/${lang}${path}`;
@@ -40,21 +44,31 @@ export function translate(
   key: TranslationKey,
   values: Record<string, string | number> = {},
 ): string {
-  const dictionary: Dictionary = dictionaries[lang];
-  const overrides = settings.text[lang] as Partial<Dictionary>;
+  const dictionary: Dictionary =
+    dictionaries[lang] || dictionaries[defaultLanguage];
+  const overrides = (settings.text[lang as keyof typeof settings.text] ||
+    {}) as Partial<Dictionary>;
   const singularKey = `${key}.one` as TranslationKey;
   const selectedKey =
     typeof values.count === "number" &&
-    new Intl.PluralRules(locales[lang]).select(values.count) === "one" &&
+    new Intl.PluralRules(locales[lang] || locales[defaultLanguage]).select(
+      values.count,
+    ) === "one" &&
     singularKey in dictionary
       ? singularKey
       : key;
-  const text = overrides[selectedKey] ?? dictionary[selectedKey];
-  if (typeof text !== "string")
-    throw new Error(`Unknown translation key: ${selectedKey}`);
+  const text =
+    overrides[selectedKey] ??
+    dictionary[selectedKey] ??
+    dictionaries[defaultLanguage][selectedKey] ??
+    key;
+  if (typeof text !== "string") return key;
   const parameters = {
     site: settings.site.name,
-    name: settings.author.name[lang],
+    name:
+      (settings.author.name as Record<string, string>)[lang] ||
+      (settings.author.name as Record<string, string>)[defaultLanguage] ||
+      settings.site.name,
     ...values,
   };
   return text.replace(/\{(\w+)\}/g, (placeholder, name: string) =>
@@ -77,7 +91,7 @@ export function formatDate(
     day: "numeric",
   },
 ): string {
-  return new Intl.DateTimeFormat(locales[lang], {
+  return new Intl.DateTimeFormat(locales[lang] || locales[defaultLanguage], {
     timeZone: "UTC",
     ...options,
   }).format(new Date(value));

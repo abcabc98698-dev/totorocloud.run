@@ -24,12 +24,21 @@ export function getSiteInfo(lang: Language) {
   };
 }
 
+export const siteVerification = (settings as any).verification ?? {
+  google: "",
+  bing: "",
+  baidu: "",
+  shenma: "",
+};
+
+const multiLangNavUrls = new Set(["/", "/about/", "/projects/", "/posts/"]);
+
 export function getHeaderConfig(lang: Language) {
   return {
     title: settings.site.logoText,
     navLinks: settings.navigation.map(({ label, url }) => ({
       name: translate(lang, label as TranslationKey),
-      url: localizePath(lang, url),
+      url: multiLangNavUrls.has(url) ? localizePath(lang, url) : url,
     })),
   };
 }

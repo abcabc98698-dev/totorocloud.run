@@ -4,12 +4,304 @@ import BlogLayout from "../../layouts/BlogLayout.astro";
 import PostFeed from "../../components/posts/PostFeed.vue";
 import PostListFallback from "../../components/posts/PostListFallback.astro";
 import { getPosts, summarize } from "../../lib/posts";
+import { FEATURED_BRAND } from "../../data/brands";
+
 export const getStaticPaths = languagePaths;
 const lang = getLanguage(Astro.params.lang);
 const posts = (await getPosts(lang)).map(summarize);
 ---
 
 <BlogLayout home pageType="CollectionPage">
+  <!-- Conversion & Network Observatory Hero -->
+  <section class="home-hero-card card">
+    <div class="hero-top">
+      <div class="badge-cluster">
+        <span class="live-badge">
+          <span class="dot"></span> 实时遥测数据已更新
+        </span>
+        <span class="mono-badge">42 家机场品牌收录</span>
+        <span class="mono-badge">100% 晚高峰实测</span>
+      </div>
+      <h1 class="hero-title">
+        龙猫云 (TotoroCloud) · 专业网络可观测与机场测速实验室
+      </h1>
+      <p class="hero-subtitle">
+        告别虚标与充值排名。我们以真实多线 BGP 物理探针，全天候监测 42 家机场的
+        IEPL/IPLC 专线延迟、晚高峰丢包率与 ChatGPT / Claude 3.5 / Netflix 4K
+        原生解锁状态。
+      </p>
+
+      <!-- Channel Direct Shortcuts -->
+      <div class="hero-channels">
+        <a href="/brands/" class="channel-btn">
+          <span class="icon-[lucide--grid]"></span>
+          <span>42家机场品牌库</span>
+        </a>
+        <a href="/clients/" class="channel-btn">
+          <span class="icon-[lucide--download]"></span>
+          <span>全平台客户端大全</span>
+        </a>
+        <a href="/observatory/" class="channel-btn">
+          <span class="icon-[lucide--activity]"></span>
+          <span>专线测速实验室</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- No.1 Featured Spotlight: 光速云 -->
+    <div class="featured-banner">
+      <div class="featured-left">
+        <div class="spotlight-title">
+          <span class="tag-no1">NO.1 综合标杆首推</span>
+          <h3>{FEATURED_BRAND.name} (Guangsu Cloud)</h3>
+        </div>
+        <p class="spotlight-desc">
+          2020 年稳定运营至今 · IEPL 专线 + 企业级内网专线双架构 · VLESS 协议 ·
+          单节点最高 2.5Gbps 带宽 · 香港/日本/新加坡原生极速。
+        </p>
+        <div class="spotlight-meta">
+          <span class="meta-item">
+            入门起步：<strong>{FEATURED_BRAND.entryPrice}</strong>
+          </span>
+          <span class="meta-item">
+            专属券码：<code class="code-box">{FEATURED_BRAND.coupon}</code>
+          </span>
+        </div>
+      </div>
+
+      <div class="featured-right">
+        <a
+          href={FEATURED_BRAND.affUrl}
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          class="btn-flagship"
+        >
+          直达官网注册体验 ↗
+        </a>
+        <a href={`/brands/${FEATURED_BRAND.slug}/`} class="btn-flagship-detail">
+          查看 2026 实测报告 →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Article Feed & Guides -->
   <PostFeed posts={posts} lang={lang} client:load />
   <PostListFallback posts={posts} />
 </BlogLayout>
+
+<style>
+  .home-hero-card {
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    background: var(--card);
+  }
+
+  .hero-top {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .badge-cluster {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .live-badge .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #34d399;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #34d399;
+  }
+
+  .mono-badge {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 2px 0 0;
+    line-height: 1.35;
+    color: var(--fg);
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .hero-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .channel-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .channel-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .featured-banner {
+    margin-top: 20px;
+    padding: 18px 20px;
+    background: linear-gradient(
+      135deg,
+      rgba(2, 132, 199, 0.12) 0%,
+      rgba(15, 23, 42, 0.3) 100%
+    );
+    border: 1.5px solid #0284c7;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .featured-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 680px;
+  }
+
+  .spotlight-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tag-no1 {
+    font-size: 10px;
+    font-weight: 700;
+    background: #0284c7;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .spotlight-title h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+
+  .spotlight-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .spotlight-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .spotlight-meta strong {
+    color: var(--accent);
+    font-family: var(--font-mono, monospace);
+    font-size: 14px;
+  }
+
+  .code-box {
+    background: #111418;
+    color: #fbbf24;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #334155;
+    font-weight: 700;
+  }
+
+  .featured-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .btn-flagship {
+    background: #0284c7;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-flagship:hover {
+    opacity: 0.9;
+  }
+
+  .btn-flagship-detail {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .btn-flagship-detail:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .featured-banner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .featured-right {
+      align-items: flex-start;
+      flex-direction: row;
+    }
+  }
+</style>

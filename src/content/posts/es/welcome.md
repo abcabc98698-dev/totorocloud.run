@@ -1,6 +1,6 @@
 ---
-title: "Bienvenido a Grimorio"
-description: "Una presentación rápida de esta plantilla: qué trae, cómo está pensada y cómo empezar a escribir tus propios artículos."
+title: "Bienvenido a TotoroCloud"
+description: "Una introducción a TotoroCloud: arquitectura en la nube moderna, principios de ingeniería y nuestra base técnica de conocimiento."
 date: 2026-03-15
 lang: es
 category: guides
@@ -8,24 +8,24 @@ tags: ["Astro", "Blogging"]
 featured: true
 ---
 
-Si estás leyendo esto, acabas de estrenar **Grimorio**, una plantilla de blog hecha con Astro pensada para escribir sin pelearte con la herramienta. Este artículo es de ejemplo, igual que los otros dos que vienen incluidos: bórralos cuando quieras y empieza con lo tuyo.
+Bienvenido a **TotoroCloud**. Esta publicación de ingeniería está dedicada a explorar sistemas distribuidos escalables, infraestructura cloud moderna y flujos de trabajo prácticos para desarrolladores.
 
-![Un escritorio ordenado junto a una ventana](/covers/welcome.webp)
+![Un escritorio ordenado con equipo de ingeniería moderno](/covers/welcome.webp)
 
-## Qué trae
+## Arquitectura y Enfoque
 
-La idea es que tengas lo importante resuelto desde el minuto uno y solo te preocupes de escribir:
+Nuestro objetivo es proporcionar análisis técnicos rigurosos y referencias arquitectónicas de alto impacto:
 
-- **Dos idiomas** listos para usar: inglés en `/` y español en `/es/`, con un botón para saltar de uno a otro.
-- **Búsqueda** en toda la web con `Ctrl` / `⌘ + K`.
-- **Modo claro y oscuro** que respeta la preferencia de tu sistema.
-- **Imágenes sociales** generadas sola para cada artículo, sin que tengas que diseñar nada.
-- **SEO** resuelto: sitemap, RSS, metadatos y datos estructurados.
+- **Documentación bilingüe** diseñada para una comunicación técnica global sin fricciones.
+- **Búsqueda instantánea indexada** accesible mediante atajos de teclado (`Ctrl` / `⌘ + K`).
+- **Entrega de alto rendimiento** optimizada para latencia mínima y métricas Core Web Vitals excelentes.
+- **Generación dinámica de recursos** para previsualizaciones sociales enriquecidas y distribución Open Graph.
+- **Optimización SEO completa** con sitemaps automáticos, feeds semánticos y grafos Schema estructurados.
 
-## Cómo escribir
+## Estándares de Ingeniería
 
-Cada artículo es un archivo Markdown dentro de `src/content/posts/`. Creas el archivo, rellenas cuatro datos arriba (título, fecha, idioma y categoría) y escribes. Si quieres la versión en el otro idioma, usas el mismo nombre de archivo en la otra carpeta y el botón de idioma enlazará las dos solo.
+Cada artículo de esta base de conocimiento se redacta con claridad y profundidad. Nos enfocamos en restricciones de ingeniería reales, pruebas de rendimiento en producción y diseño de sistemas resilientes.
 
-> Escribe primero, ordena después. La plantilla está para quitarte fricción, no para añadirte pasos.
+> Construye primero bases resilientes; escala con precisión y telemetría medible.
 
-Échale un vistazo al artículo **Escribir con Markdown** para ver todo lo que puedes usar dentro de un post, y cámbialo todo a tu gusto desde `src/site.config.json`.
+Explora nuestras guías técnicas, desgloses de arquitectura de sistemas y notas de desarrollo en toda la publicación.

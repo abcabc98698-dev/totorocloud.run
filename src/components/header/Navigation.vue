@@ -15,11 +15,22 @@ const headerConfig = getHeaderConfig(props.lang);
 const home = localizePath(props.lang, "/");
 // Highlight any "0" in the logo text (e.g. a name like "r0ot").
 const brandParts = headerConfig.title.split(/(0)/).filter(Boolean);
+const isMultiLangPath = (path: string) => {
+  const norm = path.endsWith("/") ? path : path + "/";
+  return (
+    norm === "/" ||
+    norm === "/about/" ||
+    norm === "/projects/" ||
+    norm === "/posts/" ||
+    norm === "/posts/welcome/" ||
+    norm === "/posts/writing-with-markdown/" ||
+    norm === "/posts/a-weekend-in-the-mountains/"
+  );
+};
 const otherLanguage = languages.find((value) => value !== props.lang)!;
-const otherLanguageUrl = localizePath(
-  otherLanguage,
-  stripLanguage(props.pathname),
-);
+const rawPath = stripLanguage(props.pathname);
+const targetPath = isMultiLangPath(rawPath) ? rawPath : "/";
+const otherLanguageUrl = localizePath(otherLanguage, targetPath);
 const isDark = ref(false);
 const isAtTop = ref(true);
 const menuOpen = ref(false);

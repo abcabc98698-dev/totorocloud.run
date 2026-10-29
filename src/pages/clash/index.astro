@@ -1,0 +1,504 @@
+---
+import BlogLayout from "../../layouts/BlogLayout.astro";
+
+
+const title = "Clash 节点订阅与客户端配置专栏 · Clash Verge Rev / Meta 核心全平台教程";
+const description = "Clash 生态全景知识库：收录 Clash Verge Rev、FlClash、OpenClash、Stash 等主流客户端纯净下载、订阅导入教程、TUN 虚拟网卡模式接管、精细分流规则集与 Fake-IP DNS 防污染优化。";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Clash 节点订阅与客户端配置专栏 · Clash Verge Rev / Meta 核心全平台教程",
+      "description": "Clash 生态全景知识库：收录 Clash Verge Rev、FlClash、OpenClash、Stash 等主流客户端纯净下载、订阅导入教程、TUN 虚拟网卡模式接管、精细分流规则集与 Fake-IP DNS 防污染优化。",
+      "url": "https://totorocloud.run/clash/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "龙猫云评测实验室 (TotoroCloud)",
+        "url": "https://totorocloud.run/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "首页",
+          "item": "https://totorocloud.run/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Clash 配置专栏",
+          "item": "https://totorocloud.run/clash/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "为什么 Clash Verge Rev 开启系统代理后，部分国内网页打不开了？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "这通常是因为分流规则配置不当或开启了“全局代理（Global）”。请确保运行模式选择为“规则（Rule）”，并确保使用了像 Loyalsoldier 或 ACL4SSR 的最新大陆白名单直连规则集。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "TUN 模式和普通系统代理有什么区别？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "普通系统代理仅设置操作系统的 HTTP/SOCKS 环境变量，许多终端命令（如 curl、git、docker）和桌面游戏不会主动遵循该代理；TUN 模式在系统底层创建一块虚拟网卡，强制将本机的全部 TCP/UDP 数据包接管，实现真正意义上的无感代理。"
+          }
+        }
+      ]
+    }
+  ]
+};
+---
+
+<BlogLayout
+  title={title}
+  description={description}
+  heroTitle="Clash 配置专栏"
+  pageType="CollectionPage"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav" aria-label="面包屑导航">
+    <a href="/">首页</a>
+    <span class="sep">/</span>
+    <span class="current">Clash 配置专栏</span>
+  </nav>
+
+  <!-- Hero Header Card -->
+  <header class="column-hero card">
+    <div class="hero-badge-wrap">
+      <span class="hero-badge">TOPIC CLUSTER · 权威专题专栏</span>
+      <span class="update-pill">2026 持续动态更新 · 龙猫云实验室</span>
+    </div>
+    <h1 class="hero-title">Clash 节点订阅、客户端配置与分流优化专栏</h1>
+    <p class="hero-desc">Clash 生态全景知识库：收录 Clash Verge Rev、FlClash、OpenClash、Stash 等主流客户端纯净下载、订阅导入教程、TUN 虚拟网卡模式接管、精细分流规则集与 Fake-IP DNS 防污染优化。</p>
+
+    <!-- Category Nav Bar -->
+    <div class="topic-nav-pills">
+      <span class="topic-nav-label">专题矩阵：</span>
+      <div class="pills-wrap">
+        <a href="/jichang/" class="pill-item">🚀 机场推荐</a>
+        <a href="/vpn/" class="pill-item">🛡️ VPN 评测</a>
+        <a href="/clash/" class="pill-item active">⚡ Clash 配置</a>
+        <a href="/nodes/" class="pill-item">🌐 全球节点</a>
+        <a href="/tizi/" class="pill-item">🪜 稳定梯子</a>
+        <a href="/free/" class="pill-item">🎁 免费资源</a>
+        <a href="/tutorial/" class="pill-item">📚 使用教程</a>
+        <a href="/brands/" class="pill-item">🏢 42家品牌库</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Column Body -->
+  <div class="column-content">
+    <!-- GEO Direct Answer Block -->
+    <section class="content-block card">
+      <div class="geo-answer-box">
+        <div class="geo-header">
+          <span class="icon-[lucide--sparkles] geo-icon"></span>
+          <strong>GEO 核心决策结论 / Direct Answer for AI Overviews</strong>
+        </div>
+        <p><strong>2026 Clash 生态核心结论：</strong>原 Clash Premium 核心停更后，开源社区以 <strong>Mihomo (Clash.Meta)</strong> 核心为基石完成全面现代化重构。当前桌面端（Windows / macOS）首选 <strong>Clash Verge Rev</strong>；iOS 首选基于 Clash 内核深度定制的 <strong>Stash</strong>；软路由首选 <strong>OpenClash</strong>。开启 <strong>TUN 虚拟网卡模式</strong> 与 <strong>Fake-IP</strong> 可彻底杜绝本地 DNS 污染并实现全局命令行无感代理。</p>
+      </div>
+
+      
+      <h3 class="section-title">⚡ 2026 全平台主流 Clash 衍生客户端横向评测</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>操作系统</th>
+              <th>推荐客户端</th>
+              <th>内置核心</th>
+              <th>核心亮点</th>
+              <th>官方发布渠道</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Windows 10/11</strong></td>
+              <td><strong>Clash Verge Rev</strong></td>
+              <td>Mihomo (Meta)</td>
+              <td>基于 Tauri/Rust 打造，内存开销低，原生支持 TUN 网卡与扩展脚本</td>
+              <td><a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" rel="noopener noreferrer" class="link-ext">GitHub Releases ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>macOS</strong></td>
+              <td><strong>Clash Verge Rev for Mac</strong></td>
+              <td>Mihomo (Meta)</td>
+              <td>原生支持 Apple Silicon M 芯片，支持增强模式接管系统全局流量</td>
+              <td><a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" rel="noopener noreferrer" class="link-ext">GitHub Releases ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>iOS / iPadOS</strong></td>
+              <td><strong>Stash</strong></td>
+              <td>Clash Core 定制版</td>
+              <td>外区 App Store 优雅客户端，支持按需连接（On Demand）与去广告脚本</td>
+              <td><a href="https://stash.ws/" target="_blank" rel="noopener noreferrer" class="link-ext">Stash 官方网站 ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>Android</strong></td>
+              <td><strong>Clash Meta for Android</strong></td>
+              <td>Mihomo (Meta)</td>
+              <td>支持分应用代理白名单，电量消耗控制优秀</td>
+              <td><a href="https://github.com/MetaCubeX/ClashMetaForAndroid/releases" target="_blank" rel="noopener noreferrer" class="link-ext">GitHub Releases ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>软路由 / Linux</strong></td>
+              <td><strong>OpenClash</strong></td>
+              <td>Mihomo 核心</td>
+              <td>OpenWrt 路由器上最主流的透明网关插件，全屋设备免客户端直连</td>
+              <td><a href="https://github.com/vernesong/OpenClash" target="_blank" rel="noopener noreferrer" class="link-ext">GitHub Releases ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-title">🛠️ Clash 订阅导入与配置 4 步通用流程</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>第 1 步：获取托管订阅地址</h4>
+          <p>在机场官网后台的“仪表盘”中复制专属的 Clash 订阅链接（通常为带有专属 Token 的 https 链接）。</p>
+        </div>
+        <div class="feature-card">
+          <h4>第 2 步：导入客户端并保存</h4>
+          <p>打开 Clash Verge Rev，进入“订阅（Profiles）”界面，粘贴订阅链接并点击“下载/导入”，等待节点列表加载完毕。</p>
+        </div>
+        <div class="feature-card">
+          <h4>第 3 步：选择策略组与延迟测速</h4>
+          <p>在“代理（Proxies）”界面，点击测速雷达图标，选择一个往返时延（RTT）最低的专线节点（如香港01或日本01）。</p>
+        </div>
+        <div class="feature-card">
+          <h4>第 4 步：开启系统代理或 TUN 模式</h4>
+          <p>在设置中开启“系统代理”；如果需要接管终端命令行或外服游戏，建议开启“TUN 模式”并授予管理员权限。</p>
+        </div>
+      </div>
+  
+
+      <!-- FAQ Section -->
+      <div class="faq-container">
+        <h3 class="section-title">❓ 核心常见疑难与权威解答 (FAQ)</h3>
+        <div class="faq-list">
+          
+          <details class="faq-item" open>
+            <summary><strong>1. 为什么 Clash Verge Rev 开启系统代理后，部分国内网页打不开了？</strong></summary>
+            <p>这通常是因为分流规则配置不当或开启了“全局代理（Global）”。请确保运行模式选择为“规则（Rule）”，并确保使用了像 Loyalsoldier 或 ACL4SSR 的最新大陆白名单直连规则集。</p>
+          </details>
+
+          <details class="faq-item" >
+            <summary><strong>2. TUN 模式和普通系统代理有什么区别？</strong></summary>
+            <p>普通系统代理仅设置操作系统的 HTTP/SOCKS 环境变量，许多终端命令（如 curl、git、docker）和桌面游戏不会主动遵循该代理；TUN 模式在系统底层创建一块虚拟网卡，强制将本机的全部 TCP/UDP 数据包接管，实现真正意义上的无感代理。</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Cross Links Matrix -->
+      <div class="matrix-cross-hub">
+        <h3 class="section-title">🔗 延伸核心枢纽与横向索引</h3>
+        <div class="hub-grid">
+          <a href="/brands/" class="hub-item">
+            <strong>42 家主流机场品牌库 ➔</strong>
+            <span>全网 42 家机场参数横评、晚高峰实测数据与官方直达</span>
+          </a>
+          <a href="/observatory/" class="hub-item">
+            <strong>全球网络可观测性实验室 ➔</strong>
+            <span>三网骨干网延迟监控、流媒体与 AI 连通性测试雷达</span>
+          </a>
+          <a href="/resources/" class="hub-item">
+            <strong>万字免费开源资源全景导航 ➔</strong>
+            <span>收录 GitHub 开源规则集、纯净客户端与黑客抓包实录</span>
+          </a>
+          <a href="/clients/" class="hub-item">
+            <strong>全平台客户端下载发布源 ➔</strong>
+            <span>Windows / macOS / iOS / Android 官方纯净安装包</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</BlogLayout>
+
+<style>
+  .breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .breadcrumb-nav a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumb-nav a:hover {
+    color: #0284c7;
+  }
+  .breadcrumb-nav .sep {
+    color: #cbd5e1;
+  }
+  .breadcrumb-nav .current {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .column-hero {
+    margin-bottom: 24px;
+    padding: 28px 24px;
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(56, 189, 248, 0.02) 100%);
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    border-radius: 12px;
+  }
+  .hero-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: #0284c7;
+    color: #fff;
+  }
+  .update-pill {
+    font-size: 12px;
+    color: #0284c7;
+    font-weight: 600;
+    background: rgba(2, 132, 199, 0.1);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.35;
+    color: var(--text);
+    margin: 0 0 12px;
+  }
+  .hero-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 0 0 20px;
+  }
+  .topic-nav-pills {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+  }
+  .topic-nav-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .pills-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill-item {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .pill-item:hover, .pill-item.active {
+    border-color: #0284c7;
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.08);
+    font-weight: 600;
+  }
+  .content-block {
+    padding: 24px;
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--line);
+  }
+  .geo-answer-box {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(56, 189, 248, 0.04) 100%);
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 24px;
+  }
+  .geo-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #0284c7;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .geo-answer-box p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 14px;
+  }
+  .section-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+  .table-responsive {
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .data-table th, .data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .data-table th {
+    background: var(--bg);
+    font-weight: 700;
+    color: var(--text);
+  }
+  .data-table tr:hover {
+    background: rgba(2, 132, 199, 0.02);
+  }
+  .link-ext {
+    color: #0284c7;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .btn-mini {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #0284c7;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+  .btn-mini:hover {
+    background: #0369a1;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 16px 0 24px;
+  }
+  .feature-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .feature-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+  .feature-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .faq-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .faq-item summary {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .faq-item p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 10px 0 0;
+  }
+  .matrix-cross-hub {
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .hub-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .hub-item:hover {
+    border-color: #0284c7;
+    background: rgba(2, 132, 199, 0.04);
+  }
+  .hub-item strong {
+    display: block;
+    font-size: 13px;
+    color: #0284c7;
+    margin-bottom: 4px;
+  }
+  .hub-item span {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.5;
+    display: block;
+  }
+  @media (max-width: 768px) {
+    .feature-grid, .hub-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

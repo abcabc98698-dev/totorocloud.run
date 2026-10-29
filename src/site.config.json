@@ -1,32 +1,52 @@
 {
   "site": {
-    "name": "Grimorio",
-    "logoText": "Grimorio",
+    "name": "龙猫云",
+    "logoText": "龙猫云 TotoroCloud",
     "favicon": "/favicon.ico",
     "keywords": {
-      "es": [
-        "Grimorio",
-        "plantilla Astro",
-        "blog de seguridad",
-        "seguridad ofensiva",
-        "Hack The Box"
+      "zh": [
+        "龙猫云",
+        "TotoroCloud",
+        "2026机场推荐",
+        "IEPL专线机场",
+        "IPLC专线",
+        "光速云",
+        "Clash订阅节点",
+        "Shadowrocket小火箭",
+        "v2rayN客户端",
+        "ChatGPT解锁机场",
+        "4K流媒体机场",
+        "外贸跨境网络加速"
       ],
       "en": [
-        "Grimorio",
-        "Astro theme",
-        "security blog",
-        "offensive security",
-        "Hack The Box"
+        "TotoroCloud",
+        "Longmaoyun",
+        "Airport Proxy Recommendations 2026",
+        "IEPL Private Line",
+        "IPLC Dedicated",
+        "Guangsu Cloud",
+        "Clash Node Subscription",
+        "Shadowrocket Nodes",
+        "ChatGPT Unlock Proxy",
+        "Network Observatory"
+      ],
+      "es": [
+        "TotoroCloud",
+        "proxy aeropuerto 2026",
+        "línea dedicada IEPL",
+        "desbloqueo de streaming",
+        "observatorio de red"
       ]
     }
   },
   "author": {
     "name": {
-      "es": "Grimorio",
-      "en": "Grimorio"
+      "zh": "龙猫云评测实验室",
+      "en": "TotoroCloud Lab",
+      "es": "TotoroCloud"
     },
-    "handle": "Grimorio",
-    "github": "https://github.com/sud0pls/Grimorio-astro"
+    "handle": "TotoroCloud",
+    "github": "https://github.com/totorocloud"
   },
   "navigation": [
     {
@@ -34,12 +54,24 @@
       "url": "/"
     },
     {
-      "label": "nav.posts",
-      "url": "/posts/"
+      "label": "nav.brands",
+      "url": "/brands/"
     },
     {
-      "label": "nav.projects",
-      "url": "/projects/"
+      "label": "nav.clients",
+      "url": "/clients/"
+    },
+    {
+      "label": "nav.observatory",
+      "url": "/observatory/"
+    },
+    {
+      "label": "nav.resources",
+      "url": "/resources/"
+    },
+    {
+      "label": "nav.posts",
+      "url": "/posts/"
     },
     {
       "label": "nav.about",
@@ -60,8 +92,15 @@
       "url": "/rss.xml"
     }
   ],
+  "verification": {
+    "google": "",
+    "bing": "",
+    "baidu": "",
+    "shenma": ""
+  },
   "text": {
-    "es": {},
-    "en": {}
+    "zh": {},
+    "en": {},
+    "es": {}
   }
 }

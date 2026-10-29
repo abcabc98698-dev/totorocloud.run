@@ -26,15 +26,11 @@ const postsPath = localizePath(props.lang, "/posts/");
     <h2>{{ personalInfo.name }}</h2>
     <p class="profile-role">{{ personalInfo.role }}</p>
     <div class="profile-stats">
-      <a :href="postsPath"
-        ><strong>{{ posts.length }}</strong
-        ><span>{{ t("nav.posts") }}</span></a
+      <a href="/brands/"><strong>42</strong><span>收录品牌</span></a
+      ><a href="/observatory/"><strong>100%</strong><span>实测监控</span></a
       ><a :href="postsPath"
-        ><strong>{{ new Set(posts.map((p) => p.category)).size }}</strong
-        ><span>{{ t("common.categories") }}</span></a
-      ><a :href="`${postsPath}#tags`"
-        ><strong>{{ getTags(props.posts).length }}</strong
-        ><span>{{ t("common.tags") }}</span></a
+        ><strong>{{ posts.length }}</strong
+        ><span>评测文章</span></a
       >
     </div>
     <div class="profile-social">

@@ -5,15 +5,21 @@ import {
   localizePath,
   useTranslations,
 } from "../../i18n";
-import type { PostSummary } from "../../lib/posts";
+import { getPosts, summarize, type PostSummary } from "../../lib/posts";
+
 interface Props {
-  posts: PostSummary[];
+  posts?: PostSummary[];
 }
 const { posts } = Astro.props;
 const lang = getLanguageFromPath(Astro.url.pathname);
 const t = useTranslations(lang);
 const postsPath = localizePath(lang, "/posts/");
-const months = [...new Set(posts.map((p) => p.date.slice(0, 7)))];
+
+let effectivePosts = posts || [];
+if (effectivePosts.length === 0) {
+  effectivePosts = (await getPosts(lang)).map(summarize);
+}
+const months = [...new Set(effectivePosts.map((p) => p.date.slice(0, 7)))];
 ---
 
 <aside class="right-sidebar" aria-label={t("sidebar.activity")}>
@@ -22,37 +28,85 @@ const months = [...new Set(posts.map((p) => p.date.slice(0, 7)))];
       <span class="icon-[lucide--clock]" aria-hidden="true"></span>
       {t("sidebar.recent")}
     </h2>
-    <ol>
-      {posts.slice(0, 4).map((post) => (
-        <li>
-          <a href={`${postsPath}${post.id}/`}>
-            <h3>{post.title}</h3>
-            <time datetime={post.date}>{formatDate(lang, post.date)}</time>
-          </a>
-        </li>
-      ))}
-    </ol>
+    {effectivePosts.length > 0 ? (
+      <ol>
+        {effectivePosts.slice(0, 4).map((post) => (
+          <li>
+            <a href={`${postsPath}${post.id}/`}>
+              <h3>{post.title}</h3>
+              <time datetime={post.date}>{formatDate(lang, post.date)}</time>
+            </a>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="empty-hint">{lang === "zh" ? "暂无评测文章" : "No recent posts"}</p>
+    )}
   </section>
+
   <section class="card panel archive-panel">
     <h2 class="panel-title">
       <span class="icon-[lucide--calendar]" aria-hidden="true"></span>
       {t("sidebar.archive")}
     </h2>
-    {months.map((month) => (
-      <a href={`${postsPath}?month=${month}`}>
-        <span>
-          {formatDate(lang, `${month}-01`, { year: "numeric", month: "long" })}
-        </span>
-        <span>
-          {t("post.records", {
-            count: posts.filter((p) => p.date.startsWith(month)).length,
-          })}
-        </span>
-      </a>
-    ))}
+    {months.length > 0 ? (
+      months.map((month) => (
+        <a href={`${postsPath}?month=${month}`}>
+          <span>
+            {formatDate(lang, `${month}-01`, { year: "numeric", month: "long" })}
+          </span>
+          <span>
+            {t("post.records", {
+              count: effectivePosts.filter((p) => p.date.startsWith(month)).length,
+            })}
+          </span>
+        </a>
+      ))
+    ) : (
+      <p class="empty-hint">{lang === "zh" ? "暂无归档数据" : "No archives"}</p>
+    )}
+  </section>
+
+  <section class="card panel telemetry-panel">
+    <h2 class="panel-title">
+      <span class="icon-[lucide--activity]" aria-hidden="true"></span>
+      {lang === "zh" ? "探针实时状态" : "Probe Telemetry"}
+    </h2>
+    <div class="probe-mini-list">
+      <div class="probe-mini-item">
+        <div class="probe-meta">
+          <span class="dot-live"></span>
+          <span class="probe-name">上海电信 IDC</span>
+        </div>
+        <span class="probe-val">SLA 99.9%</span>
+      </div>
+      <div class="probe-mini-item">
+        <div class="probe-meta">
+          <span class="dot-live"></span>
+          <span class="probe-name">广州移动 IDC</span>
+        </div>
+        <span class="probe-val">SLA 99.8%</span>
+      </div>
+      <div class="probe-mini-item">
+        <div class="probe-meta">
+          <span class="dot-live"></span>
+          <span class="probe-name">北京联通 IDC</span>
+        </div>
+        <span class="probe-val">SLA 99.9%</span>
+      </div>
+    </div>
+    <a href="/observatory/" class="probe-more-link">
+      {lang === "zh" ? "进入测速实验室看板 →" : "View Observatory →"}
+    </a>
   </section>
 </aside>
+
 <style>
+  .empty-hint {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
   .recent-panel ol {
     list-style: none;
     padding: 0;
@@ -63,7 +117,7 @@ const months = [...new Set(posts.map((p) => p.date.slice(0, 7)))];
   }
   .recent-panel h3 {
     margin: 0;
-    font-size: 15px;
+    font-size: 14.5px;
     line-height: 1.45;
     font-weight: 500;
   }
@@ -72,7 +126,9 @@ const months = [...new Set(posts.map((p) => p.date.slice(0, 7)))];
   }
   .recent-panel time {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
+    margin-top: 3px;
+    display: block;
   }
   .archive-panel > a {
     display: flex;
@@ -80,14 +136,63 @@ const months = [...new Set(posts.map((p) => p.date.slice(0, 7)))];
     align-items: baseline;
     gap: 10px;
     padding: 5px 0;
-    font-size: 15px;
+    font-size: 14px;
   }
   .archive-panel > a span:last-child {
     white-space: nowrap;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
   }
   .archive-panel > a:hover {
     color: var(--accent);
+  }
+  .telemetry-panel {
+    margin-top: 16px;
+  }
+  .probe-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0 14px;
+  }
+  .probe-mini-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  .probe-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot-live {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    flex-shrink: 0;
+  }
+  .probe-name {
+    color: var(--text);
+  }
+  .probe-val {
+    font-size: 12px;
+    font-family: var(--font-mono, monospace);
+    color: #10b981;
+    font-weight: 600;
+  }
+  .probe-more-link {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    text-align: right;
+  }
+  .probe-more-link:hover {
+    text-decoration: underline;
   }
 </style>

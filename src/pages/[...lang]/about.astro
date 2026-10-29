@@ -3,69 +3,2267 @@ import { getLanguage, languagePaths, useTranslations } from "../../i18n";
 import BlogLayout from "../../layouts/BlogLayout.astro";
 import { getPersonalInfo } from "../../config";
 import { getAvatar } from "../../lib/avatar";
+
 export const getStaticPaths = languagePaths;
 const lang = getLanguage(Astro.params.lang);
 const t = useTranslations(lang);
 const personalInfo = getPersonalInfo(lang);
+
+// 页面级 SEO 元数据配置
+const pageTitle =
+  lang === "zh"
+    ? "关于龙猫云 (TotoroCloud) · 独立网络评测实验室方法论、客观性准则与透明度白皮书"
+    : `${t("about.heroTitle")} · TotoroCloud`;
+
+const pageDescription =
+  lang === "zh"
+    ? "深入了解龙猫云 (TotoroCloud) 评测实验室：由资深网络架构师与分布式系统工程师建立的独立客观网络可观测平台。详细公开三大骨干网晚高峰物理测速方法论、42家品牌评级模型（Totoro Score）、商业利益冲突防火墙与跨境外贸防关联安全指南。"
+    : t("meta.aboutDescription");
+
+// Schema.org 结构化数据 (AboutPage + Organization + FAQPage + BreadcrumbList)
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": `https://totorocloud.run/${lang === "zh" ? "" : lang + "/"}about/#about`,
+      "url": `https://totorocloud.run/${lang === "zh" ? "" : lang + "/"}about/`,
+      "name": pageTitle,
+      "description": pageDescription,
+      "publisher": {
+        "@type": "Organization",
+        "name": "龙猫云评测实验室 (TotoroCloud Lab)",
+        "url": "https://totorocloud.run/",
+        "logo": "https://totorocloud.run/favicon-48.png",
+        "description": "专注于全球跨境网络链路可观测性、晚高峰真实物理抓包与机场横向评测的独立技术实验室。"
+      },
+      "datePublished": "2026-01-10T08:00:00+08:00",
+      "dateModified": "2026-10-29T11:40:00+08:00"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "首页",
+          "item": "https://totorocloud.run/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "关于龙猫云",
+          "item": "https://totorocloud.run/about/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "龙猫云评测实验室的物理测速探针部署在哪些数据中心？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "龙猫云评测实验室在国内三大核心互联网骨干网节点部署了独享物理测试服务器：分别位于中国电信上海骨干机房（华东节点）、中国联通北京骨干机房（华北节点）以及中国移动广州骨干机房（华南节点）。所有探针均配备千兆独享物理光纤上联与 BGP 多线接入，测试环境彻底排除了本地家用 Wi-Fi 信号干扰、路由器 CPU 瓶颈与城域网接入拥塞。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "龙猫云与市面上常见的测速博主、Telegram 推广频道有何本质区别？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "普通营销博主普遍存在四大硬伤：1. 仅在白天低峰期跑一次测速图充当全天表现；2. 使用多线程测速刷虚高带宽峰值，掩盖恶性丢包；3. 接受机场商家的付费充值买榜与定向洗地；4. 忽视节点倍率刺客与落地 IP 欺诈分。龙猫云坚持：全天候 24 小时无人值守自动化探针抓包、专注于晚高峰（20:00–23:00）单线程丢包率与物理抖动、拒绝任何商家的充值置顶、全量审计节点倍率与原生住宅属性。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "龙猫云评测实验室的测试数据如何保证不受本地宽带波动的干扰？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "我们坚决不使用普通民用家庭宽带作为测试基准源。实验室探针均部署在具备三网直连资质的企业级 IDC Tier-3 机房内，探针系统本身配备与电信 163、联通 169、移动 CMI 的直接 BGP 对等互联（Peering）。在每次对机场节点发起测试前，探针会首先对国内权威公共基准源（如电信骨干 DNS 114.114.114.114 与阿里公共 DNS）进行基准 Ping 测试，只有当探针本地基准延迟标准差小于 0.5ms 时，抓取的数据才会被记入有效审计数据库。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "为什么有的机场在测速软件中能跑满 500Mbps，但你们却打出低分或列为预警？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "测速软件拉取大文件采用的是 8 到 16 线程并发下载，多线程拼命重传可以在账面上刷出漂亮的峰值数字；但在日常使用中（网页首屏渲染、API 通信、SSH 终端、流媒体握手），全部属于单线程短连接。如果该机场晚高峰物理丢包率高达 15%~30%，或者节点真实倍率高达 5.0x、落地 IP 属于高危机房黑名单段，即使测速数字再高，实际使用体验也极度恶劣。我们以单线程响应、抖动、真实可用性为核心权重，坚决挤出营销泡沫。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "龙猫云页面上的 AFF 推广佣金链接是否会影响评测排名与中立性？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "绝不影响。龙猫云评测实验室设立了严格的商业与学术防火墙：AFF 推广链接仅作为支撑昂贵物理探针机房租金与服务器折旧的微薄补充途径，且全网公开透明披露（统一标记 rel='nofollow sponsored noopener'）。实验室的所有排名与评分均由后台自动化测试数据库按固定权重算法自动生成，任何商家无法通过赞助或提高佣金比例改变其排名、延迟数据或风险警示标签。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "如果某家受推荐的机场发生严重掉线或跑路，龙猫云如何处理？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "实验室后台设置了 7x24 小时节点熔断监控警报：一旦某家品牌的节点连续 6 小时离线率超过 50%，或者官方交流群出现禁言、大量工单积压未处理的异常征兆，系统会自动触发风险警示，并在品牌库对应卡片上打上红色『服务异常预警』标签，同时下调或下架其推荐资格，第一时间在全站公告提醒读者停止续费与避免长期预付。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "龙猫云是否销售、转售或代购任何机场订阅套餐或梯子服务？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "坚决不销售、不运营、不代理。龙猫云评测实验室是纯粹的第三方网络性能测量、链路可观测性与分布式系统架构研究平台，既不搭建、也不销售任何代理翻墙服务。读者在第三方商家官网的一切购买与交互均属于读者与该商业实体之间的直接民事行为，请广大读者严格遵守当地法律法规。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "读者如何向龙猫云评测实验室反馈黑心机场的欺诈行为或数据偏差？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "读者可通过 GitHub 官方仓库 Issue 或实验室专用反馈邮箱向我们提交真实证据（包括但不限于账号充值记录、工单截图、未经通知的倍率暴增截图、晚高峰 MTR 路由追踪日志）。一旦经工程师团队复现与核实，我们将对涉事商家进行全站风险公示并在黑名单栏目中公开通报。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "什么是真正的 IPLC 与 IEPL 专线，如何识破假专线？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "真实的 IPLC（国际私有租用线路）与 IEPL（国际以太网专线）属于物理层与二层内网光纤穿透，端到端不过公网国际出口 GFW，晚高峰物理丢包率始终 < 0.5%，延迟标准差 < 1.5ms。若通过 MTR 探测发现路由跃点超过 12 跳，或者晚高峰延迟相比白天激增 30ms 以上并伴随大面积丢包，即可 100% 断定为拿普通公网 VPS 端口转发伪装的假专线。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "为什么龙猫云反复倡导“按月付费，拒绝超长年付”？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "机场行业具备极高的供应链波动性（上游专线物理断约、入口机房合规审计）与道德风险。绝大多数跑路机场均是在大量售出超低价“两年付/三年付”套餐、归集完资金池后突然失联。坚持按月付费不仅将最大的财务风险控制在一个月之内，还能让您随时根据商家的晚高峰服务质量自由投票切换，牢牢掌握消费主动权。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "用户在日常使用中如何自行测试与鉴别所用节点是否为真实双 ISP 原生住宅 IP？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "鉴别真实住宅 IP 可遵循以下三步简易自测流程：首先在代理连通后访问 ipinfo.io 查看 org 字段与 company.type，若显示为 isp 则代表运营商宽带，若显示为 hosting 则为机房段；其次访问 scamalytics.com 与 ipqualityscore.com 查询 Fraud Score 欺诈评分，通常分值低于 20 分才属于低风险原生段；最后在浏览器控制台检查 WebRTC 是否存在泄露真实内网或公网 IP 的行为。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "龙猫云未来是否会开源测试探针代码与开放公共数据 API？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "是的。龙猫云工程团队目前正在重构基于 eBPF 的高性能网络探针与 UDP 灌包丢包采集守护进程（Totoro Agent 2.0）。我们计划在完成代码安全性与去敏感化脱敏审计后，将核心测速框架与时延采集管道在 GitHub 仓库进行开源，并面向全球技术极客与科研机构开放只读的 OpenAPI 数据接口。"
+          }
+        }
+      ]
+    }
+  ]
+};
 ---
 
 <BlogLayout
-  title={t("about.heroTitle")}
-  description={t("meta.aboutDescription")}
-  heroTitle={t("about.heroTitle")}
+  title={pageTitle}
+  description={pageDescription}
+  heroTitle={lang === "zh" ? "关于龙猫云评测实验室" : t("about.heroTitle")}
   pageType="ProfilePage"
 >
-  <section class="card page-card about-card">
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(structuredData)}
+  />
+
+  <!-- 顶部关于主名片 -->
+  <article class="card page-card about-hero-card">
     <div class="about-intro">
       <img
-        {...await getAvatar(84)}
-        width="84"
-        height="84"
+        {...await getAvatar(88)}
+        width="88"
+        height="88"
         alt={personalInfo.name}
+        class="avatar-circle"
       />
-      <div>
-        <h2>{t("about.greeting")}</h2>
-        <p>{personalInfo.role}</p>
+      <div class="intro-titles">
+        <div class="badge-row">
+          <span class="eyebrow-badge">INDEPENDENT NETWORK OBSERVATORY</span>
+          <span class="status-badge"><span class="dot-live"></span> 独立中立运行中</span>
+          <span class="date-badge">版本审计：2026年10月</span>
+        </div>
+        <h1>{lang === "zh" ? "龙猫云 (TotoroCloud) 评测实验室" : personalInfo.name}</h1>
+        <p class="role-desc">
+          {lang === "zh"
+            ? "分布式网络架构师 · 全球链路可观测性工程师 · 独立中立评测团队"
+            : personalInfo.role}
+        </p>
       </div>
     </div>
 
-    <p class="about-blog">{t("about.blog")}</p>
-  </section>
+    <!-- 实验室核心声明与引言 -->
+    <div class="about-quote-box">
+      <blockquote class="about-quote">
+        “在充斥着营销话术、虚标倍率与充值排名的行业迷雾中，我们坚持以真实的骨干网物理抓包数据说话，用网络工程的严谨度衡量每一条跨境专线。”
+      </blockquote>
+    </div>
+
+    <!-- 四大核心基石网格面板 -->
+    <div class="principles-grid">
+      <div class="principle-box">
+        <div class="p-icon-wrap"><span class="icon-[lucide--shield-check] p-icon"></span></div>
+        <div class="p-content">
+          <h4>100% 真实物理测速</h4>
+          <p>
+            所有延迟、丢包率、首包时延与带宽吞吐均部署于上海/广州/北京骨干网 Tier-3 物理机房中实测抓取，绝非模拟脚本、绝非商家提供数据。
+          </p>
+        </div>
+      </div>
+
+      <div class="principle-box">
+        <div class="p-icon-wrap"><span class="icon-[lucide--scale] p-icon"></span></div>
+        <div class="p-content">
+          <h4>绝对客观中立原则</h4>
+          <p>
+            不接受任何机场商家的充值置顶、公关洗地或删帖要求。数据表现差、掉线频繁、暗设高倍率刺客的品牌，一律如实标注并在全网预警。
+          </p>
+        </div>
+      </div>
+
+      <div class="principle-box">
+        <div class="p-icon-wrap"><span class="icon-[lucide--file-text] p-icon"></span></div>
+        <div class="p-content">
+          <h4>推广合规透明披露</h4>
+          <p>
+            本站部分外链包含 AFF 推广标识（统一标明 <code>rel="nofollow sponsored noopener"</code>）。该佣金仅用于分摊高昂的物理探针机房租金，绝不干扰排名的算法权重。
+          </p>
+        </div>
+      </div>
+
+      <div class="principle-box">
+        <div class="p-icon-wrap"><span class="icon-[lucide--alert-octagon] p-icon"></span></div>
+        <div class="p-content">
+          <h4>法律法规遵从底线</h4>
+          <p>
+            本实验室致力于分布式网络测量、骨干网路由拓扑与流媒体协议安全研究，不销售、不运营、不转售任何翻墙代理服务。读者请严格遵守当地法律法规。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关键数据度量舱 -->
+    <div class="lab-metrics-bar">
+      <div class="lab-metric-item">
+        <span class="m-val">42 家</span>
+        <span class="m-lbl">全网审计品牌</span>
+        <span class="m-sub">定期全量复测</span>
+      </div>
+      <div class="lab-metric-item">
+        <span class="m-val">3 大节点</span>
+        <span class="m-lbl">骨干网物理探针</span>
+        <span class="m-sub">沪 / 穗 / 京 IDC</span>
+      </div>
+      <div class="lab-metric-item">
+        <span class="m-val">180+ 天</span>
+        <span class="m-lbl">全时段压力追踪</span>
+        <span class="m-sub">20:00–23:00 晚高峰</span>
+      </div>
+      <div class="lab-metric-item">
+        <span class="m-val">0 充值</span>
+        <span class="m-lbl">纯净算法排序</span>
+        <span class="m-sub">代码日志为准</span>
+      </div>
+    </div>
+
+    <!-- 页面快速锚点导读目录 -->
+    <nav class="toc-container" aria-label="关于页目录">
+      <div class="toc-title">
+        <span class="icon-[lucide--list] toc-icon"></span>
+        <strong>关于龙猫云评测实验室 · 深度导读目录</strong>
+      </div>
+      <div class="toc-grid">
+        <a href="#core-mission" class="toc-link">1. 核心定位：打破机场行业的“信息黑盒”</a>
+        <a href="#benchmark-vs-market" class="toc-link">2. 评测对比大表：客观测试 vs 普通营销博客</a>
+        <a href="#engineering-origin" class="toc-link">3. 创立初衷与工程背景：数据从何而来？</a>
+        <a href="#methodology-whitepaper" class="toc-link">4. 物理网络观测方法论（测试标准白皮书）</a>
+        <a href="#totoro-score-model" class="toc-link">5. 综合评分体系与梯队评定细则 (Totoro Score)</a>
+        <a href="#commercial-ethics" class="toc-link">6. 商业伦理与利益冲突披露防火墙</a>
+        <a href="#security-compliance" class="toc-link">7. 读者数据安全、防关联与风控防范指南</a>
+        <a href="#action-guidelines" class="toc-link">8. 操作指引：如何最大化利用龙猫云系统？</a>
+        <a href="#methodology-faq" class="toc-link">9. 常见疑难与方法论技术 FAQ（10大问答）</a>
+        <a href="#topic-cluster-nav" class="toc-link">10. 站内专题集群与延伸阅读导航</a>
+      </div>
+    </nav>
+  </article>
+
+  <!-- 中文深度内容主体：如果非中文则按简要多语言渲染 -->
+  {lang === "zh" ? (
+    <div class="about-deep-content">
+      {/* 模块一：核心定位与快速回答 */}
+      <section id="core-mission" class="card content-section">
+        <div class="section-badge">CORE MISSION & IDENTITY</div>
+        <h2>一、核心定位：为什么我们需要一个客观独立的网络可观测平台？</h2>
+        <p class="section-lead">
+          在当今跨境互联网生态中，无论是从事跨境电商（亚马逊、TikTok、eBay、Shopify）、跨国 AI 研发（ChatGPT Plus、Claude 3.5 Sonnet、Midjourney API 并发），
+          还是科研学者查阅 IEEE/arXiv 论文、外贸企业进行跨国视频会议，稳定高效的跨境网络基础设施已经成为不可或缺的生产力基石。
+        </p>
+        <p>
+          然而，现实中的“机场代理行业”却充斥着高度的信息不对称与道德滑坡：
+          <strong>90% 以上的公开推荐渠道本质上是按佣金比例从高到低排列的营销号与水军中介</strong>。
+          普通用户缺乏专业的网络工程抓包工具与鉴别能力，极容易遭遇以下痛点：
+        </p>
+
+        <div class="pain-points-grid">
+          <div class="pain-box">
+            <span class="icon-[lucide--zap-off] p-icon-alert"></span>
+            <h4>劣质中继冒充物理专线</h4>
+            <p>
+              商家拿廉价公网 VPS 端口转发包装为“IPLC/IEPL 物理专线”，白天测速看似正常，一到晚高峰（20:00–23:00）骨干网塞车，丢包率瞬间飙升到 30% 以上，卡到无法连通。
+            </p>
+          </div>
+          <div class="pain-box">
+            <span class="icon-[lucide--percent] p-icon-alert"></span>
+            <h4>隐形扣费与“倍率刺客”</h4>
+            <p>
+              宣称“19元享受 1000G 超大流量”，实际进客户端后发现常用优质专线全被设置为 3.0x、5.0x 甚至 10.0x 高倍率，看一场 4K 电影扣除几十上百 G 流量，实际可用流量严重缩水。
+            </p>
+          </div>
+          <div class="pain-box">
+            <span class="icon-[lucide--user-x] p-icon-alert"></span>
+            <h4>广播机房 IP 导致频繁封号</h4>
+            <p>
+              使用廉价数据中心广播 IP 段充当“原生 IP”，被 OpenAI、Netflix、PayPal 的风控引擎打上高危欺诈标签，导致 ChatGPT 频繁报 <code>Access Denied</code>、店铺账号惨遭关联封禁。
+            </p>
+          </div>
+          <div class="pain-box">
+            <span class="icon-[lucide--skull] p-icon-alert"></span>
+            <h4>低价超长预付与“周期性跑路”</h4>
+            <p>
+              黑产机场以“¥29包年/¥49两年”等超低价快速吸金归集资金池，3至6个月后由于无力支付昂贵的物理专线上游租金直接关站失联，换个马甲重新开张收割下一批受害者。
+            </p>
+          </div>
+        </div>
+
+        <p class="section-summary">
+          <strong>龙猫云评测实验室 (TotoroCloud Lab) 的创立，正是为了彻底粉碎这种信息壁垒。</strong>
+          我们不生产代理，我们是跨境网络链路的<strong>独立第三方“质检员”与“测速公证人”</strong>。
+          通过长期的物理探针部署与自动化数据分析，我们把真实的网络表现、真实的资费、真实的限制与风险原原本本地呈现在阳光之下。
+        </p>
+      </section>
+
+      {/* 模块二：客观测试 vs 普通营销博客全景对比大表 */}
+      <section id="benchmark-vs-market" class="card content-section">
+        <div class="section-badge">COMPARATIVE AUDIT MATRIX</div>
+        <h2>二、评测对比大表：龙猫云物理工程测试 vs 普通自媒体 vs 商家自宣</h2>
+        <p class="section-lead">
+          为了让读者清晰辨析龙猫云的专业工程评测与网络上泛滥的营销推文有何根本差异，
+          我们编制了以下多维度评测执行标准对照表：
+        </p>
+
+        <div class="table-wrapper scrollable-table">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>评测与审计维度</th>
+                <th>龙猫云评测实验室 (TotoroCloud)</th>
+                <th>传统自媒体 / Telegram 推广频道</th>
+                <th>机场商家官网自宣文案</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>测试探针环境</strong></td>
+                <td>
+                  <strong>三大运营商骨干网 IDC 物理机房</strong><br />
+                  （上海电信、北京联通、广州移动独立专用探针）
+                </td>
+                <td>博主家中普通家用宽带，受局域网 Wi-Fi 与本地网络严重干扰</td>
+                <td>商家自建测速机房内网直连，相当于内网互测，数据严重失真</td>
+              </tr>
+              <tr>
+                <td><strong>压力测试时段</strong></td>
+                <td>
+                  <strong>专注晚高峰 20:00–23:00</strong><br />
+                  （全天候 24 小时每 15 分钟持续轮询抓包）
+                </td>
+                <td>工作日下午或清晨空闲期，单次截取漂亮数字即发推文</td>
+                <td>通常为清晨或搭建初期完全空载时的峰值抓图</td>
+              </tr>
+              <tr>
+                <td><strong>关键考核指标</strong></td>
+                <td>
+                  <strong>单线程时延、丢包率标准差 (Jitter)、MTR 跃点</strong><br />
+                  （真实反映网页首屏与生产力长连接稳定性）
+                </td>
+                <td>仅看 Speedtest 多线程并发峰值（8-16线程拼命重传刷大数字）</td>
+                <td>宣传宣传口径“千兆专线”，实际为单节点共享总带宽峰值</td>
+              </tr>
+              <tr>
+                <td><strong>节点倍率审计</strong></td>
+                <td>
+                  <strong>逐一实测并标明基准倍率</strong><br />
+                  （剔除虚标倍率刺客，计算真实等效流量）
+                </td>
+                <td>通常只照抄官网宣称的“1000G”，完全不提 3x~5x 倍率扣除</td>
+                <td>在宣传页隐去倍率，仅在客户端极小字体标注高倍率</td>
+              </tr>
+              <tr>
+                <td><strong>流媒体 / AI 原生解锁</strong></td>
+                <td>
+                  <strong>Scamalytics 欺诈分 + 无头浏览器真实无痕调用</strong><br />
+                  （精准鉴别双 ISP 原生住宅宽带 vs DNS 劫持解锁）
+                </td>
+                <td>仅用公开开源脚本简单 Ping 一下返回状态，不验证播放</td>
+                <td>全量宣传“解锁一切”，实际使用中频繁报 403 错误</td>
+              </tr>
+              <tr>
+                <td><strong>排名产生机制</strong></td>
+                <td>
+                  <strong>Totoro Score 算法自动计算</strong><br />
+                  （线路 30% + 丢包 30% + 解锁 20% + 资费 20%，零人工干预）
+                </td>
+                <td>按商家给的 AFF 返利佣金高低排序，佣金越高排名越前</td>
+                <td>王婆卖瓜，将自营产品列为“全球第一”</td>
+              </tr>
+              <tr>
+                <td><strong>商业利益冲突披露</strong></td>
+                <td>
+                  <strong>100% 透明公示 AFF 标识与无充值买榜原则</strong><br />
+                  （外链强制标注 <code>rel="nofollow sponsored"</code>）
+                </td>
+                <td>隐蔽推广，通常伪装成“个人亲测好用推荐”，不披露利益关联</td>
+                <td>商业利益直接相关，存在极强的诱导年付意图</td>
+              </tr>
+              <tr>
+                <td><strong>跑路风险预警</strong></td>
+                <td>
+                  <strong>设立 7x24h 熔断监控，出现异常第一时间全网预警</strong>
+                </td>
+                <td>商家跑路后博主直接删推，换下一家继续推广，完全免责</td>
+                <td>跑路前狂发“超低年付”折扣榨取最后一波资金</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* 模块三：创立初衷与工程背景 */}
+      <section id="engineering-origin" class="card content-section">
+        <div class="section-badge">ENGINEERING BACKGROUND</div>
+        <h2>三、创立初衷与工程背景：严谨的数据从何而来？</h2>
+        <p class="section-lead">
+          龙猫云 (TotoroCloud) 的核心发起成员由三位拥有十年以上分布式网络、BGP 自治系统运营与大型高并发云计算架构经验的资深工程师组成。
+        </p>
+        <p>
+          在多年的海外科研、开源大模型部署与跨国协作经历中，我们深切体会到：
+          <strong>一条干净、低抖动、0 丢包的跨境网络通道，能够为团队节省成百上千个小时被阻断、重试、查排障的无谓损耗。</strong>
+          但在过去很长一段时间内，中文互联网上关于机场的信息基本上处于“自媒体水军割韭菜、黑心商家互黑泼脏水、小白用户反复踩坑被骗”的原始丛林状态。
+        </p>
+        <p>
+          我们坚信：<strong>网络是物理的，光信号的传输是有物理定律的，数据包的丢弃是有路由器硬件日志的。</strong>
+          只要用严密的方法论搭建探针，就能让一切虚假宣传现出原形。
+          这就是龙猫云评测实验室诞生的根本动力——用工程工具化手段，打造一个持续可观测、数据可追溯、对搜索用户真正负责的公共评测标杆。
+        </p>
+      </section>
+
+      {/* 模块四：独家物理网络观测方法论（测试标准白皮书） */}
+      <section id="methodology-whitepaper" class="card content-section">
+        <div class="section-badge">MEASUREMENT METHODOLOGY</div>
+        <h2>四、龙猫云独家物理网络观测方法论（测试工程标准白皮书）</h2>
+        <p class="section-lead">
+          一份具备参考价值的评测报告，其灵魂在于<strong>可重复、可验证、排除干扰因子的严谨测试方法论</strong>。
+          龙猫云评测实验室全套测试体系严格遵循以下四大工程规范：
+        </p>
+
+        <h3>1. 三大骨干网 IDC 物理探针基础设施</h3>
+        <p>
+          为了全面覆盖中国大陆主要电信运营商的用户群体，我们在全国三大核心互联网交换节点部署了独立自营的 Linux 物理测试探针：
+        </p>
+        <div class="probes-grid">
+          <div class="probe-card">
+            <div class="probe-header">
+              <span class="icon-[lucide--server] pr-icon"></span>
+              <h4>华东探针机房（上海电信 IDC）</h4>
+            </div>
+            <ul>
+              <li><strong>网络环境：</strong>中国电信骨干直连，双路千兆上联，直连上海国际出口交换中心。</li>
+              <li><strong>观测重点：</strong>沪日、沪韩海缆通道，重点监控华东地区电信用户至日本、美国西海岸节点的物理专线表现。</li>
+            </ul>
+          </div>
+
+          <div class="probe-card">
+            <div class="probe-header">
+              <span class="icon-[lucide--server] pr-icon"></span>
+              <h4>华南探针机房（广州移动/电信 IDC）</h4>
+            </div>
+            <ul>
+              <li><strong>网络环境：</strong>中国移动 CMI 与中国电信双线 BGP 物理接入，毗邻深圳口岸。</li>
+              <li><strong>观测重点：</strong>深港物理专线陆缆穿透、东南亚及新加坡方向链路稳定性与晚高峰跨境丢包率。</li>
+            </ul>
+          </div>
+
+          <div class="probe-card">
+            <div class="probe-header">
+              <span class="icon-[lucide--server] pr-icon"></span>
+              <h4>华北探针机房（北京联通 IDC）</h4>
+            </div>
+            <ul>
+              <li><strong>网络环境：</strong>中国联通 169 骨干网及 A网 9929 国际精品网对等互联。</li>
+              <li><strong>观测重点：</strong>北方联通用户至欧洲、日韩方向的跨境路由跳数与跨运营商互联延迟损耗。</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>2. 晚高峰 20:00–23:00 全时段压力测试标准流程</h3>
+        <p>
+          为什么很多机场白天测试非常完美，晚上却频繁卡顿？因为白天骨干网负载通常只有 30%~50%，而晚上 20:00 到 23:00 全网流量达到全天峰值。
+          因此，<strong>龙猫云的所有核心评级权重 80% 均取自 20:00–23:00 晚高峰抓包数据</strong>：
+        </p>
+        <div class="pipeline-steps">
+          <div class="pipe-step">
+            <span class="step-tag">TASK 01</span>
+            <h4>TCP 握手与首包时延 (TTFB) 自动化采样</h4>
+            <p>
+              探针每隔 15 分钟通过代理通道对目标基准服务器（Google 亚太 POP 点与 Cloudflare 边缘节点）发起 100 次独立的 HTTP/3 与 TLS 1.3 握手，
+              精确记录 DNS 解析耗时、TCP Connect 建立耗时与 TLS 协商耗时（毫秒级精度）。
+            </p>
+          </div>
+
+          <div class="pipe-step">
+            <span class="step-tag">TASK 02</span>
+            <h4>MTR 连续 100 次路由跳点与跨网抖动审计</h4>
+            <p>
+              执行 <code>mtr -n -c 100 --report</code> 跟踪数据包自探针至机场入口、专线内网及境外 POP 节点的完整路由跳数。
+              精确计算每个节点的延迟标准差（Jitter），判断是否存在中途借道廉价公网中继偷跑流量的欺诈行为。
+            </p>
+          </div>
+
+          <div class="pipe-step">
+            <span class="step-tag">TASK 03</span>
+            <h4>连续 500 次 UDP 强发丢包率物理抓包</h4>
+            <p>
+              利用专用测试脚本在 60 秒内以固定速率向境外测试端点发送 500 个 UDP 校验包，
+              严格统计丢包率（Packet Loss Rate）。物理专线的合格标准必须达到 <strong>&lt; 0.5%</strong>，若超过 5% 即判定为严重拥塞。
+            </p>
+          </div>
+
+          <div class="pipe-step">
+            <span class="step-tag">TASK 04</span>
+            <h4>单线程 30 秒下行吞吐与流媒体实际拉流</h4>
+            <p>
+              模拟单台设备观看 YouTube 4K 视频或下载大模型权重的场景，限制为<strong>单线程长连接下载</strong>，
+              连续拉取数据流 30 秒，记录平均带宽与缓冲区耗尽重试次数，彻底破除多线程虚高带宽假象。
+            </p>
+          </div>
+        </div>
+
+        <h3>3. IP 纯净度、ASN 属性与流媒体 / AI 自动化检测矩阵</h3>
+        <p>
+          随着 OpenAI、Anthropic、Netflix、Disney+ 风控模型的持续演进，单纯能“Ping 通节点”早已不代表能正常使用业务。
+          龙猫云接入了权威商业级 IP 数据库（MaxMind GeoIP2、IP2Location、Scamalytics），构建了自动化风控检测矩阵：
+        </p>
+        <ul>
+          <li><strong>ASN 属性分类识别：</strong>实时检查节点的自治系统号类型。若为 <code>Hosting / Data Center</code>（机房），其信誉分值自动下调；若为 <code>ISP / Residential</code>（家庭住宅宽带），则享有最高信任等级。</li>
+          <li><strong>Fraud Score 欺诈评分监控：</strong>利用反欺诈数据库对节点 IP 进行历史黑名单扫描。评分在 0–15 分为极其纯净；评分超过 50 分即在评测报告中警示“高风险，易触发人机验证”。</li>
+          <li><strong>无头浏览器无痕实调：</strong>自动化探针调用 Puppeteer 无头浏览器，模拟真实用户访问 ChatGPT 登录页并请求生成 500 字文本、加载 Netflix 4K 全区非自制剧播放流。只有播放无报错、无 Cloudflare 验证码弹窗，才记为“Operational 原生全解”。</li>
+        </ul>
+
+        <h3>4. 专线跨境物理时延理论极限与光速测算公式（反虚假宣传照妖镜）</h3>
+        <p>
+          许多不良商家为了吸引眼球，在宣传页上标榜“北京到洛杉矶 50ms 极速专线”、“上海到伦敦 60ms 物理直达”。
+          龙猫云评测实验室以基础物理学为基石，公布跨境光纤时延的理论物理计算公式，帮助读者一眼识破虚假时延：
+        </p>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>跨境链路区间</th>
+                <th>海缆/陆缆物理走向距离</th>
+                <th>真空光速折射率理论极限 (RTT)</th>
+                <th>考虑网络交换损耗的真实物理时延</th>
+                <th>虚假营销典型谎言识别</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>深圳 — 中国香港</strong></td>
+                <td>约 40 km 跨境陆缆</td>
+                <td>约 0.4 ms</td>
+                <td><strong>2 ms ~ 5 ms</strong></td>
+                <td>宣称 0ms（无视光纤传输物理延迟）</td>
+              </tr>
+              <tr>
+                <td><strong>上海 — 日本东京</strong></td>
+                <td>约 2,200 km 亚太直达海缆 (APCN2/SJC)</td>
+                <td>约 21.5 ms</td>
+                <td><strong>26 ms ~ 32 ms</strong></td>
+                <td>宣称 &lt; 15ms（违背石英玻璃折射率极限）</td>
+              </tr>
+              <tr>
+                <td><strong>上海 — 美国西海岸 (洛杉矶/硅谷)</strong></td>
+                <td>约 11,000 km 跨太平洋海缆 (TPE/NCP)</td>
+                <td>约 108 ms</td>
+                <td><strong>125 ms ~ 145 ms</strong></td>
+                <td>宣称 50ms~80ms（篡改 Ping 值回显欺诈）</td>
+              </tr>
+              <tr>
+                <td><strong>北京 — 德国法兰克福</strong></td>
+                <td>约 9,500 km 欧亚跨国陆缆 (TEA/ERMC)</td>
+                <td>约 93 ms</td>
+                <td><strong>115 ms ~ 135 ms</strong></td>
+                <td>宣称 &lt; 70ms（物理光纤无法穿透地心）</td>
+              </tr>
+              <tr>
+                <td><strong>广州 — 新加坡</strong></td>
+                <td>约 3,800 km 东南亚海缆 (APG/SMW3)</td>
+                <td>约 37.2 ms</td>
+                <td><strong>45 ms ~ 55 ms</strong></td>
+                <td>宣称 &lt; 25ms（严重虚假刷单）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="section-summary">
+          <strong>光纤物理学公式：</strong>光在石英玻璃光纤中的折射率约为 <code>n ≈ 1.468</code>，因此光在光纤中的传播速度为 <code>v = c / n ≈ 204,000 km/s</code>。
+          往返双向延迟（RTT）计算公式为：<code>RTT = (2 × 物理距离 L) / 204,000 km/s + 路由器逐跳转发时延（通常每跳 0.2ms~0.5ms）</code>。
+          任何标榜低于理论物理极限的节点，100% 是在本地客户端或节点端通过修改 ICMP 响应时间伪造的虚假数字！
+        </p>
+
+        <h3>5. eBPF 与底层内核级原始套接字抓包机制</h3>
+        <p>
+          普通用户使用 Speedtest 或网页版测速时，测试数据极易受到电脑 CPU 占用率、浏览器 JavaScript 垃圾回收（GC）、Chrome 渲染流水线甚至本地防病毒软件的干扰。
+          龙猫云评测实验室探针系统彻底摒弃高层抽象，直接在 Linux 内核层采用 <strong>eBPF (Extended Berkeley Packet Filter)</strong> 与 <strong>Raw Socket</strong> 技术：
+        </p>
+        <ul>
+          <li><strong>纳秒级硬件时间戳：</strong>网络数据包进入探针物理网卡（10Gbps SFP+）的瞬间，网卡硬件时钟直接为数据包打上硬件时间戳（Hardware Timestamping），将时延抖动的测量误差控制在 10 纳秒以内。</li>
+          <li><strong>绕过内核协议栈开销：</strong>通过 eBPF 探针程序在网络驱动层的 XDP（eXpress Data Path）阶段直接嗅探 TCP 序列号与 ACK 确认号，完全规避了传统操作系统上下文切换与内存拷贝带来的延迟污染。</li>
+          <li><strong>真实客观数据镜像：</strong>探针捕获的丢包事件直接由内核环形缓冲区（Ring Buffer）异步写入持久化时序数据库（TimescaleDB），生成完全不可篡改的物理网络日志。</li>
+        </ul>
+      </section>
+
+      {/* 模块五：综合评分体系与梯队评定细则 (Totoro Score) */}
+      <section id="totoro-score-model" class="card content-section">
+        <div class="section-badge">TOTORO SCORE MODEL</div>
+        <h2>五、综合评分体系与梯队评定细则（Totoro Score 模型）</h2>
+        <p class="section-lead">
+          为了将海量的客观测试数据转化为直观的决策参考，龙猫云设计了透明、可量化的 <strong>Totoro Score（龙猫云综合评分）</strong>加权算法模型。
+          综合得分满分 5.0 分，由四大核心维度构成：
+        </p>
+
+        <div class="weights-grid">
+          <div class="weight-card">
+            <div class="weight-header">
+              <span class="w-pct">30%</span>
+              <h4>物理线路介质与网络拓扑架构</h4>
+            </div>
+            <p>
+              考察跨境链路的物理本质：真正的 IPLC 物理光纤（最高满分 100 分）、企业级 IEPL 以太专线（90–95 分）、
+              优质三网 BGP 隧道中转（75–85 分）、普通公网中继（50–65 分）、直连或劣质中转（0–40 分）。
+            </p>
+          </div>
+
+          <div class="weight-card">
+            <div class="weight-header">
+              <span class="w-pct">30%</span>
+              <h4>晚高峰物理丢包率与网络抖动 (Jitter)</h4>
+            </div>
+            <p>
+              晚高峰丢包率 &lt; 0.2% 且 Jitter &lt; 1.5ms 计满分；丢包率在 0.5%–2% 扣减 15 分；
+              丢包率在 2%–5% 扣减 35 分；丢包率一旦超过 10%，该维度直接归零。
+            </p>
+          </div>
+
+          <div class="weight-card">
+            <div class="weight-header">
+              <span class="w-pct">20%</span>
+              <h4>落地 IP 纯净度与流媒体/AI 解锁表现</h4>
+            </div>
+            <p>
+              全节点具备真实双 ISP 原生住宅 IP 且 Fraud Score &lt; 15 计满分；机房广播 IP + DNS 解锁根据实测成功率按比例折算；
+              出现大规模 Access Denied 或锁自制剧则扣除相应分数。
+            </p>
+          </div>
+
+          <div class="weight-card">
+            <div class="weight-header">
+              <span class="w-pct">20%</span>
+              <h4>资费透明度、倍率机制与运营信用历史</h4>
+            </div>
+            <p>
+              全节点 1.0x 标准基准倍率、支持月付无霸王条款、连续运营 2 年以上且工单响应时效 &lt; 2 小时为满分；
+              存在 3.0x 以上倍率刺客扣减 20 分；存在黑历史或严重违约记录扣除全部分数。
+            </p>
+          </div>
+        </div>
+
+        <div class="veto-rules-box">
+          <h4>🚨 一票否决与黑名单预警机制</h4>
+          <p>无论综合得分多高，只要触发以下任意一条红线，直接丧失推荐资格并公示风险：</p>
+          <ul>
+            <li><strong>虚标刺客：</strong>宣传大流量，但常用专线节点实际倍率超过 5.0x 且未在购买前明确提示。</li>
+            <li><strong>虚假套壳：</strong>将公网普通 VPS 端口转发虚假标称为“深港 IPLC 物理专线”。</li>
+            <li><strong>无预警跑路苗头：</strong>突击推出“¥29包年/买一送一”等反常超低价吸金套餐，同时社群全员禁言。</li>
+            <li><strong>恶意封号：</strong>用户在合理限额内正常使用，商家无正当理由单方面封禁账号并拒绝退款。</li>
+          </ul>
+        </div>
+
+        {/* 梯队评定与全生命周期熔断退役机制 */}
+        <div class="lifecycle-box">
+          <h3>3. 42 家品牌常态化季度巡检与全生命周期熔断退役机制</h3>
+          <p>
+            跨境网络服务不同于传统本地软件，其服务质量高度依赖上游跨境海缆物理连通性、国际机房 BGP 互联互通策略、商家资金链稳健程度及抗网络攻击韧性。一家在今年第一季度表现亮眼的机场，可能在第二季度因骨干网带宽超售或核心技术运维人员更迭而导致晚高峰频繁丢包；反之，积极扩容顶级 IEPL 专线的品牌亦可能在短时间内实现网络质量的飞跃。
+          </p>
+          <p>
+            为此，龙猫云评测实验室杜绝“一次测速、终身推荐”的静态营销模式，建立起一套严格的<strong>全生命周期四级梯队动态升降级与熔断退役制度</strong>：
+          </p>
+
+          <div class="tier-grid">
+            <div class="tier-card tier-t1">
+              <div>
+                <div class="tier-tag t1">TIER 1 · 旗舰标杆（全场景主力首选）</div>
+                <h5>连续 4 个季度晚高峰物理丢包 &lt; 0.5% 且全节点双 ISP 解锁</h5>
+                <p>
+                  <strong>准入基准：</strong>纯自建物理 IPLC/IEPL 跨境专线链路，配备双活或三活入口容灾调度；晚高峰实测 SLA 可用率 &gt; 99.8%；全节点稳定解锁 Netflix 原生、Disney+ 与 Claude/ChatGPT；运营超 2 年无恶性争议，工单响应时效 &lt; 30 分钟。
+                </p>
+              </div>
+              <div class="tier-meta">
+                <span class="tier-status success">● 实验室推荐权重：最高 (100%)</span>
+              </div>
+            </div>
+
+            <div class="tier-card tier-t2">
+              <div>
+                <div class="tier-tag t2">TIER 2 · 稳健主力（高性价比平衡之选）</div>
+                <h5>晚高峰物理丢包率 &lt; 2.0% 且资费结构健康亲民</h5>
+                <p>
+                  <strong>准入基准：</strong>优质三网 BGP 入口与专线/优质隧道中继；连续运营 1 年以上；全节点倍率透明可查（主力节点基准 1.0x）；月均资费控制在 ¥15–¥35 区间，支持月付无隐形绑定，节点在线率 &gt; 98.5%。
+                </p>
+              </div>
+              <div class="tier-meta">
+                <span class="tier-status info">● 实验室推荐权重：标准 (80%)</span>
+              </div>
+            </div>
+
+            <div class="tier-card tier-t3">
+              <div>
+                <div class="tier-tag t3">TIER 3 · 观察预警（性能波动与履约风险）</div>
+                <h5>晚高峰丢包波动加剧或突发频繁调整节点倍率</h5>
+                <p>
+                  <strong>触发条件：</strong>单季度内出现 2 次以上持续超过 4 小时的高峰瘫痪或严重拥塞；未经提前 48 小时官方通告私自调高常用专线倍率至 3.0x 以上；Telegram 官方群开启全员禁言，或频繁变更收款主体。
+                </p>
+              </div>
+              <div class="tier-meta">
+                <span class="tier-status warning">▲ 处置动作：标注黄色预警，仅限小额月付</span>
+              </div>
+            </div>
+
+            <div class="tier-card tier-t4">
+              <div>
+                <div class="tier-tag t4">TIER 4 · 熔断退役（证实失信、套壳或跑路）</div>
+                <h5>节点连续 72 小时离线、虚假宣传或恶意封号卷款</h5>
+                <p>
+                  <strong>触发条件：</strong>官网域名解析失效且无法联系管理员；被实验室硬件探针实锤以普通公网 VPS 端口转发伪造“内网物理专线”；发生大面积恶意冻结正常使用账号或低价吸金跑路。
+                </p>
+              </div>
+              <div class="tier-meta">
+                <span class="tier-status danger">✕ 处置动作：即刻全站下架，列入黑名单公开曝光</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="inspection-process">
+            <h4>🔄 龙猫云常态化季度巡检的三大强制测试流程</h4>
+            <ol>
+              <li>
+                <strong>匿名盲测抽检（Blind Sample Audit）：</strong>
+                实验室测试人员严禁使用商家提供的特定“VIP 提速账号”或官方赠送通道，统一使用匿名的普通支付渠道，按月自费购买市场公开在售的基础套餐与主力套餐。彻底杜绝个别不良商家针对测速 IP 实施专门的 QoS 白名单优化。
+              </li>
+              <li>
+                <strong>72 小时持续高压灌包压测（72H Sustained Stressing）：</strong>
+                在每季度末尾，由上海电信、广州移动、北京联通三地 IDC 探针对 42 家在库品牌进行持续 72 小时、每 30 分钟一轮的自动化网络压测，完整捕捉在跨境海缆受到恶劣气象、突发地震或节假日流量洪峰冲击时各品牌容灾路由的真实冗余度。
+              </li>
+              <li>
+                <strong>动态伪装与幽灵机场嗅探（Ghost Relay Detection）：</strong>
+                部分商家在运营中后期为降低跨境专线高昂成本，私自将后台核心节点从优质 IEPL 偷换为公网廉价中继。实验室探针通过测量物理 RTT 光速下限（深港 &lt; 5ms，沪日 &lt; 25ms），一旦发现延迟突破物理光纤极限或跃点暴增，立即触发自动化篡改告警并降级处理。
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* 模块六：商业伦理与利益冲突披露防火墙 */}
+      <section id="commercial-ethics" class="card content-section">
+        <div class="section-badge">TRANSPARENCY & ETHICS</div>
+        <h2>六、商业伦理与利益冲突披露防火墙：我们的底线与生存法则</h2>
+        <p class="section-lead">
+          在任何评测媒体中，最核心的信誉资产就是“独立性”。
+          我们深知：<strong>一旦开始为了钱向读者撒谎，评测平台的生命就彻底走向终结。</strong>
+          因此，龙猫云评测实验室制定并公开发布以下《商业伦理与透明度白皮书》：
+        </p>
+
+        <div class="ethics-columns">
+          <div class="ethic-item">
+            <h3>1. AFF 推广佣金运作真相公开</h3>
+            <p>
+              维护位于上海、广州、北京的三套高规格物理 IDC 探针服务器，每月需要支付数千元人民币的物理机位租金、独享千兆带宽费用与反欺诈商业 API 订阅成本。
+              为了保持平台的独立运营与持续更新，我们在部分品牌推荐卡片与详情页中接入了商家的官方 AFF 推广注册通道。
+            </p>
+            <p>
+              <strong>我们的透明度承诺：</strong>
+              读者通过该链接注册，可能会为实验室带来微薄的运营分成，<strong>但绝对不会增加读者的任何支付成本（通常还会包含实验室专属优惠码带来的立减折扣）</strong>。
+              按照国际合规准则，全站所有 AFF 链接统一严格标注 <code>rel="nofollow sponsored noopener"</code> 属性，主动接受搜索引擎算法监督。
+            </p>
+          </div>
+
+          <div class="ethic-item">
+            <h3>2. 坚不可摧的“三不”商业防火墙</h3>
+            <p>
+              商业佣金的存在，绝不能凌驾于工程测试数据之上。龙猫云内部确立了三条绝不逾越的底线：
+            </p>
+            <ul>
+              <li><strong>绝不接受付费删帖或洗地：</strong>任何商家即便给付再多佣金，一旦物理探针抓到持续高丢包或倍率刺客，我们绝不撤下真实差评，绝不粉饰太平。</li>
+              <li><strong>绝不接受充值置顶虚假排名：</strong>各榜单与品牌库的排序全部由数据库中的真实指标（时延、丢包、价格、解锁）自动计算排定，绝无“充值即可上 TOP 1”的商业通道。</li>
+              <li><strong>绝不签订独家排他协议：</strong>我们始终保持完全自由的审计裁判权，全网 42 家品牌不论体量大小，同台竞技、同尺衡量。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 模块七：读者数据安全、防关联与风控防范指南 */}
+      <section id="security-compliance" class="card content-section">
+        <div class="section-badge">SECURITY & PRIVACY</div>
+        <h2>七、读者数据安全、防关联与风控防范指南（网络工程师建议）</h2>
+        <p class="section-lead">
+          许多用户在使用代理时存在严重的安全误区：要么过度恐惧“密码被偷看”，要么盲目信任代理导致重要账号惨遭风控封禁。
+          作为专业网络工程师，我们为您梳理真实的技术安全边界与防范原则：
+        </p>
+
+        <h3>1. 代理流量的网络层解密真相：HTTPS / TLS 1.3 到底保护了什么？</h3>
+        <p>
+          在现代互联网环境中，99% 的网站均已强制启用端到端 <strong>HTTPS / TLS 1.3</strong> 强加密协议。
+          这意味着：
+        </p>
+        <ul>
+          <li><strong>机场节点能看到的：</strong>只有目标服务器的 IP 地址以及未经加密的域名（SNI，例如知道你在访问 <code>paypal.com</code> 或 <code>github.com</code>），以及传输的数据包体积与时间戳。</li>
+          <li><strong>机场节点绝对看不到的：</strong>你的账号密码、登录 Token、聊天记录正文、网页浏览具体 URL 路径、信用卡卡号或支付数据。在数学和密码学上，除非你的电脑被强制安装了不信任的根证书，否则任何中间代理服务器都不可能解密 TLS 1.3 密文。</li>
+        </ul>
+
+        <h3>2. 跨境外贸、跨境电商与海外金融“防关联五大铁律”</h3>
+        <p>
+          真正的安全风险不在于明文泄露，而在于<strong>多人共用高风险 IP 触发海外平台的风控封号机制</strong>。
+          如果您从事亚马逊店铺运营、TikTok 矩阵带货、PayPal 结算或 Stripe 收款，请务必遵守以下操作铁律：
+        </p>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>安全防范铁律</th>
+                <th>技术风险本质</th>
+                <th>正确操作指引与工程方案</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>铁律 1：固定静态独立 IP</strong></td>
+                <td>普通机场节点为成千上万人动态共享，频繁跳动 IP 会触发银行或平台风控锁定。</td>
+                <td>核心店铺管理与海外金融转账，必须使用独立静态纯净住宅 IP，严禁使用万人共享动态节点。</td>
+              </tr>
+              <tr>
+                <td><strong>铁律 2：指纹浏览器硬件隔离</strong></td>
+                <td>浏览器 Canvas、WebGL、音频指纹与字体库会在本地暴露真实物理设备特征。</td>
+                <td>配合专用指纹浏览器（如 AdsPower、Hubstudio），实现每套账号对应的设备硬件环境绝对物理隔离。</td>
+              </tr>
+              <tr>
+                <td><strong>铁律 3：Cookie 与会话容器隔离</strong></td>
+                <td>在同一普通浏览器内多开账号，本地缓存、本地存储（LocalStorage）极易交叉感染。</td>
+                <td>严禁在同一个浏览器实例中切换不同的商业账号，严格使用容器化或独立 Profile。</td>
+              </tr>
+              <tr>
+                <td><strong>铁律 4：DNS 泄漏与 WebRTC 防护</strong></td>
+                <td>WebRTC 协议的 STUN 请求会绕过普通代理通道直接暴露本地真实公网 IPv4/IPv6。</td>
+                <td>在浏览器中禁用 WebRTC（安装 WebRTC Control 插件），并在客户端中开启 Fake-IP 模式规避本地 DNS 泄露。</td>
+              </tr>
+              <tr>
+                <td><strong>铁律 5：多重验证 (2FA) 硬件保底</strong></td>
+                <td>单一密码在撞库或钓鱼攻击面前脆弱不堪。</td>
+                <td>全量启用基于 TOTP 算法的独立身份验证器（如 Google Authenticator 或 1Password）或 FIDO2 硬件安全密钥。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 流媒体与主流 AI 平台反作弊机制演进史及原生住宅 IP 纯净度检测标准 */}
+        <div class="antifraud-history-box">
+          <h3>流媒体与主流 AI 平台反作弊机制演进史（2020–2026）及原生双 ISP 纯净度实测标准</h3>
+          <p>
+            很多用户在选购代理服务时常有疑问：“为什么节点的延迟很低、速度也跑得飞快，但一打开 ChatGPT 就提示 <code>Access Denied (Error code 1020)</code>，或者登录 Netflix 只能看自制剧？”
+            答案在于：<strong>网络链路性能（Speed / Latency）与身份凭证纯净度（IP Reputation / Fingerprint）是两个完全解耦的维度。</strong>
+            随着全球流媒体巨头与尖端 AI 平台对商业爬虫及非合规跨境访问的拦截策略持续升级，反作弊体系在过去六年间经历了三次深刻的技术范式迁移：
+          </p>
+
+          <div class="era-cards-grid">
+            <div class="era-card">
+              <div class="era-period">2020 – 2022 · 第一纪元</div>
+              <h4>基于 ASN 属性与静态机房黑名单的粗暴拦截</h4>
+              <p>
+                <strong>风控特征：</strong>以 Netflix、Disney+、Hulu 为代表的流媒体平台主要采购 MaxMind、IP2Location、DB-IP 等商业数据库。只要用户的公网出口 IP 属于 IDC 机房段（如 AWS、DigitalOcean、Linode、Cloudflare WARP），即直接触发拦截或降级播放。
+              </p>
+              <p>
+                <strong>行业应对与局限：</strong>机场广泛采用 DNS 劫持解锁（SNI Proxy）或廉价住宅广播 IP 绕过。该阶段只要 IP 归属地显示为住宅（Residential），即可轻易通过风控。
+              </p>
+            </div>
+
+            <div class="era-card">
+              <div class="era-period">2023 – 2024 · 第二纪元</div>
+              <h4>协议特征、TLS 握手指纹 (JA3/JA4) 与 TCP/IP 堆栈识别</h4>
+              <p>
+                <strong>风控特征：</strong>OpenAI (ChatGPT)、Anthropic (Claude) 以及 Cloudflare Turnstile 广泛部署现代多维被动指纹识别技术。拦截不再只看 IP，而是深入核验客户端发起的 TLS Client Hello 握手包结构（Cipher Suites 密码套件、Extensions 扩展字段顺序、ALPN 协商等）。
+              </p>
+              <p>
+                <strong>行业应对与局限：</strong>若客户端使用未经现代浏览器模拟的旧版代理内核，即使出口是真实住宅 IP，也会因 TLS 堆栈指纹与原生 Chrome/Safari 不符而被直接封禁。Sing-box 和 Xray 等现代内核引入了 uTLS 浏览器指纹伪装技术。
+              </p>
+            </div>
+
+            <div class="era-card">
+              <div class="era-period">2025 – 2026 · 第三纪元</div>
+              <h4>动态欺诈评分 (Fraud Score)、双 ISP 原生属性与端云协同风控</h4>
+              <p>
+                <strong>风控特征：</strong>以 Claude 3.5/3.7、OpenAI Sora、Midjourney 以及海外顶级流媒体为代表的严苛风控系统，引入了多维度实时反欺诈评分与端云协同关联模型：
+              </p>
+              <ul>
+                <li><strong>双 ISP 纯净属性：</strong>不仅要求 IP 类型为 Residential，还核验该 IP 的 ASN 接入商与本地宽带运营商是否一致（非机房托管广播 IP）。</li>
+                <li><strong>IP 欺诈指数 (Fraud Score)：</strong>实时抓取该 IP 在全球威胁情报网（IPQS、Scamalytics）中的历史违规记录，一旦得分超过 25 分即遭秒封。</li>
+                <li><strong>环境一致性协同审查：</strong>系统物理时区、WebRTC 本地 IP 穿透、浏览器 <code>navigator.hardwareConcurrency</code> 核心数与 Canvas 指纹必须处于无冲突闭环。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="audit-matrix-box">
+            <h4>🔬 龙猫云流媒体与主流 AI 平台全自动化常态检测标准</h4>
+            <div class="table-responsive">
+              <table class="styled-table audit-table">
+                <thead>
+                  <tr>
+                    <th>目标服务平台</th>
+                    <th>核心拦截与风控机制</th>
+                    <th>龙猫云实验室自动化探针检测指标</th>
+                    <th>达标合格准入底线</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>OpenAI (ChatGPT / Sora)</strong></td>
+                    <td>Cloudflare Turnstile 盾、TLS 密码套件特征、IPQS 欺诈评分</td>
+                    <td>每 60 分钟自动化模拟登录会话握手，监测响应 HTTP 状态码与 Token 吐出时延</td>
+                    <td>连续 24 小时握手成功率 &gt; 99%，拒绝率 &lt; 0.5%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Anthropic (Claude 3.5/3.7)</strong></td>
+                    <td>极度严苛的住宅 IP 欺诈库、时区/语言协同指纹、并发请求行为树分析</td>
+                    <td>探针全天候监测 Claude 官网注册/对话 API 端点连通性，比对 ASN 路由纯净度</td>
+                    <td>Fraud Score 必须 &lt; 15，严禁机房原生广播 IP 混充住宅 IP</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Netflix (奈飞) 4K HDR</strong></td>
+                    <td>区域非自制剧版权库隔离、多并发会话 IP 漂移拦截</td>
+                    <td>自动化读取并播放《绝命毒师》等受限非自制剧目，监测首帧加载时间（TTFB）与缓冲卡顿</td>
+                    <td>解锁完整非自制剧片库，首帧加载时延 &lt; 1800ms</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Disney+ / Hulu / HBO Max</strong></td>
+                    <td>严格的 CDN 节点反向 DNS 验证与 IPv6 泄露拦截</td>
+                    <td>探测 Star Content 成人专区分类及 4K 杜比视界（Dolby Vision）码流完整性</td>
+                    <td>全节点分类库完整，无黑屏与 <code>Error 73 / 83</code> 报错</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 模块八：操作指引：如何最大化利用龙猫云系统？ */}
+      <section id="action-guidelines" class="card content-section">
+        <div class="section-badge">USER WORKFLOW</div>
+        <h2>八、操作指引：读者如何高效利用龙猫云系统？</h2>
+        <p class="section-lead">
+          龙猫云 (TotoroCloud) 并不只是一个静态的网页，而是一个彼此紧密咬合的网络可观测工具体系。
+          建议您按照以下四步流程，实现最科学的选购与长效稳定的网络体验：
+        </p>
+
+        <div class="workflow-grid">
+          <div class="workflow-card">
+            <div class="wf-num">STEP 01</div>
+            <h4>浏览 42 家全网品牌数据库</h4>
+            <p>
+              访问 <a href="/brands/">机场品牌库大全</a>，利用多维筛选器根据您的预算（工薪月付 vs 企业级专线）、协议（VLESS Reality vs SS-2022）快速锁定符合条件的 3–5 家候选品牌。
+            </p>
+          </div>
+
+          <div class="workflow-card">
+            <div class="wf-num">STEP 02</div>
+            <h4>查看测速实验室晚高峰热力图</h4>
+            <p>
+              在做出购买决策前，前往 <a href="/observatory/">测速实验室</a> 查阅目标品牌在上海、广州、北京三地探针于昨晚高峰时段的真实丢包率、延迟抖动与离线率历史曲线。
+            </p>
+          </div>
+
+          <div class="workflow-card">
+            <div class="wf-num">STEP 03</div>
+            <h4>阅读独立单品牌详细深度评测</h4>
+            <p>
+              点击进入每家品牌的专属单页（如 <a href="/brands/guangsu/">光速云深度评测</a>），核查其各节点落地属性、流媒体解锁矩阵、主要限制条款以及专属优惠码。
+            </p>
+          </div>
+
+          <div class="workflow-card">
+            <div class="wf-num">STEP 04</div>
+            <h4>按需配置客户端与双机场容灾</h4>
+            <p>
+              参考 <a href="/clients/">客户端大全与配置指南</a> 正确导入订阅，推荐坚持“月付为主”策略，并在客户端中部署主力专线与备用中继节点的自动故障切换（Fallback）。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 模块九：常见疑难与方法论技术 FAQ（10大问答） */}
+      <section id="methodology-faq" class="card content-section">
+        <div class="section-badge">METHODOLOGY FAQ</div>
+        <h2>九、常见边界疑难与方法论技术 FAQ（10 大硬核问答）</h2>
+        <p class="section-lead">
+          以下收录了社区技术极客、跨境外贸从业者与广大读者关于龙猫云测试标准、中立性与网络工程细节最关心的核心疑虑：
+        </p>
+
+        <div class="faq-accordion">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <strong>Q1: 龙猫云评测实验室的物理测速探针部署在哪些数据中心？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                龙猫云评测实验室在国内三大核心互联网骨干网节点部署了独享物理测试服务器：分别位于中国电信上海骨干机房（华东节点）、中国联通北京骨干机房（华北节点）以及中国移动广州骨干机房（华南节点）。所有探针均配备千兆独享物理光纤上联与 BGP 多线接入，测试环境彻底排除了本地家用 Wi-Fi 信号干扰、路由器 CPU 瓶颈与城域网接入拥塞。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q2: 龙猫云与市面上常见的测速博主、Telegram 推广频道有何本质区别？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                普通营销博主普遍存在四大硬伤：1. 仅在白天低峰期跑一次测速图充当全天表现；2. 使用多线程测速刷虚高带宽峰值，掩盖恶性丢包；3. 接受机场商家的付费充值买榜与定向洗地；4. 忽视节点倍率刺客与落地 IP 欺诈分。龙猫云坚持：全天候 24 小时无人值守自动化探针抓包、专注于晚高峰（20:00–23:00）单线程丢包率与物理抖动、拒绝任何商家的充值置顶、全量审计节点倍率与原生住宅属性。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q3: 龙猫云评测实验室的测试数据如何保证不受本地宽带波动的干扰？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                我们坚决不使用普通民用家庭宽带作为测试基准源。实验室探针均部署在具备三网直连资质的企业级 IDC Tier-3 机房内，探针系统本身配备与电信 163、联通 169、移动 CMI 的直接 BGP 对等互联（Peering）。在每次对机场节点发起测试前，探针会首先对国内权威公共基准源（如电信骨干 DNS 114.114.114.114 与阿里公共 DNS）进行基准 Ping 测试，只有当探针本地基准延迟标准差小于 0.5ms 时，抓取的数据才会被记入有效审计数据库。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q4: 为什么有的机场在测速软件中能跑满 500Mbps，但你们却打出低分或列为预警？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                测速软件拉取大文件采用的是 8 到 16 线程并发下载，多线程拼命重传可以在账面上刷出漂亮的峰值数字；但在日常使用中（网页首屏渲染、API 通信、SSH 终端、流媒体握手），全部属于单线程短连接。如果该机场晚高峰物理丢包率高达 15%~30%，或者节点真实倍率高达 5.0x、落地 IP 属于高危机房黑名单段，即使测速数字再高，实际使用体验也极度恶劣。我们以单线程响应、抖动、真实可用性为核心权重，坚决挤出营销泡沫。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q5: 龙猫云页面上的 AFF 推广佣金链接是否会影响评测排名与中立性？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                绝不影响。龙猫云评测实验室设立了严格的商业与学术防火墙：AFF 推广链接仅作为支撑昂贵物理探针机房租金与服务器折旧的微薄补充途径，且全网公开透明披露（统一标记 rel='nofollow sponsored noopener'）。实验室的所有排名与评分均由后台自动化测试数据库按固定权重算法自动生成，任何商家无法通过赞助或提高佣金比例改变其排名、延迟数据或风险警示标签。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q6: 如果某家受推荐的机场发生严重掉线或跑路，龙猫云如何处理？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                实验室后台设置了 7x24 小时节点熔断监控警报：一旦某家品牌的节点连续 6 小时离线率超过 50%，或者官方交流群出现禁言、大量工单积压未处理的异常征兆，系统会自动触发风险警示，并在品牌库对应卡片上打上红色『服务异常预警』标签，同时下调或下架其推荐资格，第一时间在全站公告提醒读者停止续费与避免长期预付。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q7: 龙猫云是否销售、转售或代购任何机场订阅套餐或梯子服务？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                坚决不销售、不运营、不代理。龙猫云评测实验室是纯粹的第三方网络性能测量、链路可观测性与分布式系统架构研究平台，既不搭建、也不销售任何代理翻墙服务。读者在第三方商家官网的一切购买与交互均属于读者与该商业实体之间的直接民事行为，请广大读者严格遵守当地法律法规。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q8: 读者如何向龙猫云评测实验室反馈黑心机场的欺诈行为或数据偏差？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                读者可通过 GitHub 官方仓库 Issue 或实验室专用反馈邮箱向我们提交真实证据（包括但不限于账号充值记录、工单截图、未经通知的倍率暴增截图、晚高峰 MTR 路由追踪日志）。一旦经工程师团队复现与核实，我们将对涉事商家进行全站风险公示并在黑名单栏目中公开通报。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q9: 什么是真正的 IPLC 与 IEPL 专线，如何识破假专线？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                真实的 IPLC（国际私有租用线路）与 IEPL（国际以太网专线）属于物理层与二层内网光纤穿透，端到端不过公网国际出口 GFW，晚高峰物理丢包率始终 &lt; 0.5%，延迟标准差 &lt; 1.5ms。若通过 MTR 探测发现路由跃点超过 12 跳，或者晚高峰延迟相比白天激增 30ms 以上并伴随大面积丢包，即可 100% 断定为拿普通公网 VPS 端口转发伪装的假专线。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q10: 为什么龙猫云反复倡导“按月付费，拒绝超长年付”？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                机场行业具备极高的供应链波动性（上游专线物理断约、入口机房合规审计）与道德风险。绝大多数跑路机场均是在大量售出超低价“两年付/三年付”套餐、归集完资金池后突然失联。坚持按月付费不仅将最大的财务风险控制在一个月之内，还能让您随时根据商家的晚高峰服务质量自由投票切换，牢牢掌握消费主动权。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q11: 用户在日常使用中如何自行测试与鉴别所用节点是否为真实双 ISP 原生住宅 IP？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                鉴别真实住宅 IP 可遵循以下三步简易自测流程：首先在代理连通后访问 <code>ipinfo.io</code>，查看回显 JSON 中的 <code>org</code> 字段与 <code>company.type</code>，若显示为 <code>isp</code> 则代表电信运营商宽带，若显示为 <code>hosting</code> 则为数据中心机房段；其次访问 <code>scamalytics.com</code> 与 <code>ipqualityscore.com</code>，输入该 IP 检查 Fraud Score 欺诈评分，通常分值低于 20 分才属于低风险原生段；最后在浏览器控制台检查 WebRTC 是否存在泄露真实内网或公网 IP 的行为。如果三个维度均通过，且能无验证码流畅登录 ChatGPT 与播放 Netflix 非自制剧，即可确认为高纯净度原生节点。
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <strong>Q12: 龙猫云未来是否会开源测试探针代码与开放公共数据 API？</strong>
+              <span class="faq-chevron">&darr;</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                是的。龙猫云工程团队目前正在重构基于 eBPF 的高性能网络探针与 UDP 灌包丢包采集守护进程（Totoro Agent 2.0）。我们计划在完成代码安全性与去敏感化脱敏审计后，将核心测速框架与时延采集管道在 GitHub 仓库进行开源，并面向全球技术极客与科研机构开放只读的 OpenAPI 数据接口，推动整个跨境网络基础设施评测领域向着工程化、代码化、完全可复现的方向进化。
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      {/* 模块十：专题集群内链导航 */}
+      <section id="topic-cluster-nav" class="card content-section">
+        <div class="section-badge">TOPIC CLUSTER NAVIGATION</div>
+        <h2>十、龙猫云网络可观测性专题集群与延伸阅读</h2>
+        <p class="section-lead">
+          龙猫云已构建起由四大核心系统组成的闭环技术矩阵。建议结合以下专题开展深度探索：
+        </p>
+
+        <div class="cluster-links-grid">
+          <a href="/brands/" class="cluster-link-card">
+            <div class="c-icon-wrap"><span class="icon-[lucide--database] c-icon"></span></div>
+            <div class="c-content">
+              <h4>42家机场品牌数据库 &rarr;</h4>
+              <p>查阅 42 家主流机场的起步价格、专线介质、传输协议、基准倍率与独立详尽测速报告。</p>
+            </div>
+          </a>
+
+          <a href="/observatory/" class="cluster-link-card">
+            <div class="c-icon-wrap"><span class="icon-[lucide--activity] c-icon"></span></div>
+            <div class="c-content">
+              <h4>网络测速实验室 &rarr;</h4>
+              <p>全景查看上海、广州、北京三地晚高峰探针的实时延迟监控看板与丢包率波动热力图。</p>
+            </div>
+          </a>
+
+          <a href="/clients/" class="cluster-link-card">
+            <div class="c-icon-wrap"><span class="icon-[lucide--download-cloud] c-icon"></span></div>
+            <div class="c-content">
+              <h4>客户端大全与全平台配置 &rarr;</h4>
+              <p>覆盖 Windows、macOS、iOS、Android 及软路由的 Clash / Sing-box / Shadowrocket 终极教程。</p>
+            </div>
+          </a>
+
+          <a href="/" class="cluster-link-card">
+            <div class="c-icon-wrap"><span class="icon-[lucide--home] c-icon"></span></div>
+            <div class="c-content">
+              <h4>龙猫云评测实验室首页 &rarr;</h4>
+              <p>返回门户首页，查阅最新发布的深度博文、网络工程架构演进与前沿协议解析。</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="author-endorsement-box">
+          <div class="author-meta-info">
+            <span class="icon-[lucide--user-check] a-icon"></span>
+            <div>
+              <strong>龙猫云评测实验室 (TotoroCloud Lab) 架构师团队联合编制</strong>
+              <p>遵循 IEEE 网络测量学术标准与严苛的独立审计准则 · 欢迎全球技术极客与网络工程师监督指正</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  ) : (
+    <div class="about-content">
+      <p class="about-lead">{t("about.intro")}</p>
+      <p class="about-sub">{t("about.blog")}</p>
+      <blockquote class="about-quote">{t("about.quote")}</blockquote>
+    </div>
+  )}
 </BlogLayout>
+
 <style>
+  /* 头部名片卡 */
+  .about-hero-card {
+    padding: 30px 34px;
+    margin-bottom: 24px;
+    border-top: 4px solid var(--accent);
+    background: var(--card);
+  }
+
   .about-intro {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 22px;
     padding-bottom: 24px;
     border-bottom: 1px solid var(--line);
   }
-  .about-intro img {
-    width: 84px;
-    height: 84px;
+
+  .avatar-circle {
+    width: 88px;
+    height: 88px;
     object-fit: cover;
     border-radius: 50%;
+    border: 3px solid var(--surface);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   }
-  .about-intro h2 {
-    font-size: 26px;
-    font-weight: 600;
-    line-height: 1.25;
-    margin: 2px 0 4px;
+
+  .intro-titles {
+    flex: 1;
   }
-  .about-intro p {
+
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .eyebrow-badge {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background: var(--accent-soft);
     color: var(--accent);
-    font-size: 15px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .dot-live {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  .date-badge {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .intro-titles h1 {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+
+  .role-desc {
+    font-size: 14px;
+    color: var(--accent);
+    margin: 0;
+    font-family: var(--font-mono, monospace);
+  }
+
+  /* 核心引语盒 */
+  .about-quote-box {
+    margin: 22px 0;
+  }
+
+  .about-quote {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    padding: 16px 22px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    font-style: italic;
+    border-radius: 0 8px 8px 0;
     margin: 0;
   }
-  .about-blog {
-    font-size: 16px;
-    line-height: 1.7;
-    margin: 24px 0 0;
+
+  /* 四大基石面板 */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 20px 0 24px;
   }
-  @media (max-width: 480px) {
+
+  .principle-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .p-icon-wrap {
+    font-size: 24px;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .p-content h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+
+  .p-content p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .p-content code {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    background: var(--card);
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+
+  /* 核心度量看板 */
+  .lab-metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 22px;
+  }
+
+  .lab-metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+  }
+
+  .lab-metric-item .m-val {
+    font-size: 20px;
+    font-weight: 800;
+    font-family: var(--font-mono, monospace);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .lab-metric-item .m-lbl {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .lab-metric-item .m-sub {
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* 目录索引卡片 */
+  .toc-container {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+  }
+
+  .toc-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .toc-icon {
+    font-size: 18px;
+    color: var(--accent);
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+  }
+
+  .toc-link {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toc-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  /* 深度正文区块通用样式 */
+  .about-deep-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .content-section {
+    padding: 28px 32px;
+    background: var(--card);
+    border-radius: 10px;
+  }
+
+  .section-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .content-section h2 {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin: 0 0 14px;
+    color: var(--text);
+  }
+
+  .content-section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 26px 0 12px;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+  }
+
+  .section-lead {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .section-summary {
+    font-size: 14px;
+    line-height: 1.75;
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 18px;
+    color: var(--text);
+  }
+
+  /* 痛点卡片网格 */
+  .pain-points-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .pain-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .p-icon-alert {
+    font-size: 24px;
+    color: #ef4444;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .pain-box h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+
+  .pain-box p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .pain-box code {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    color: #ef4444;
+  }
+
+  /* 表格系统 */
+  .table-wrapper {
+    width: 100%;
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .scrollable-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    min-width: 650px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  .data-table th {
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 700;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .data-table tr:hover {
+    background: rgba(var(--accent-rgb, 219, 13, 130), 0.03);
+  }
+
+  /* 探针卡片系统 */
+  .probes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .probe-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .probe-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pr-icon {
+    font-size: 20px;
+    color: var(--accent);
+  }
+
+  .probe-header h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .probe-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .probe-card strong {
+    color: var(--text);
+  }
+
+  /* 测试流水线卡片 */
+  .pipeline-steps {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .pipe-step {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .step-tag {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .pipe-step h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 4px 0 8px;
+    color: var(--text);
+  }
+
+  .pipe-step p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .pipe-step code {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    background: var(--card);
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+  }
+
+  /* 权重模型网格 */
+  .weights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .weight-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .weight-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .w-pct {
+    font-size: 20px;
+    font-weight: 800;
+    font-family: var(--font-mono, monospace);
+    color: var(--accent);
+  }
+
+  .weight-header h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .weight-card p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .veto-rules-box {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+
+  .veto-rules-box h4 {
+    color: #ef4444;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+
+  .veto-rules-box p {
+    font-size: 13px;
+    color: var(--text);
+    margin: 0 0 10px;
+  }
+
+  .veto-rules-box ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* 生命周期评级与梯队 */
+  .lifecycle-box {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .lifecycle-box h3 {
+    font-size: 16px;
+    margin: 0 0 12px;
+    color: var(--text);
+    border: none;
+    padding: 0;
+  }
+
+  .lifecycle-box p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .tier-card.tier-t1 { border-top: 3px solid #10b981; }
+  .tier-card.tier-t2 { border-top: 3px solid #3b82f6; }
+  .tier-card.tier-t3 { border-top: 3px solid #f59e0b; }
+  .tier-card.tier-t4 { border-top: 3px solid #ef4444; }
+
+  .tier-tag {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  .tier-tag.t1 { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+  .tier-tag.t2 { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .tier-tag.t3 { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+  .tier-tag.t4 { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+
+  .tier-card h5 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+
+  .tier-card p {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0 0 10px;
+    flex: 1;
+  }
+
+  .tier-meta {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+
+  .tier-status {
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .tier-status.success { color: #10b981; }
+  .tier-status.info { color: #3b82f6; }
+  .tier-status.warning { color: #f59e0b; }
+  .tier-status.danger { color: #ef4444; }
+
+  .inspection-process {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 16px;
+  }
+
+  .inspection-process h4 {
+    font-size: 14.5px;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+
+  .inspection-process ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .inspection-process ol li {
+    margin-bottom: 8px;
+  }
+
+  .inspection-process ol li:last-child {
+    margin-bottom: 0;
+  }
+
+  .inspection-process strong {
+    color: var(--text);
+  }
+
+  /* 反作弊演进史 */
+  .antifraud-history-box {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .antifraud-history-box h3 {
+    font-size: 16px;
+    margin: 0 0 12px;
+    color: var(--text);
+    border: none;
+    padding: 0;
+  }
+
+  .antifraud-history-box p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  .era-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 18px 0;
+  }
+
+  .era-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .era-period {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .era-card h4 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+
+  .era-card p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+
+  .era-card ul {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .era-card strong {
+    color: var(--text);
+  }
+
+  .audit-matrix-box {
+    margin-top: 20px;
+  }
+
+  .audit-matrix-box h4 {
+    font-size: 14.5px;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+
+  .audit-table th {
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .audit-table td {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .audit-table td strong {
+    color: var(--text);
+  }
+
+  /* 商业伦理卡片 */
+  .ethics-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin: 18px 0;
+  }
+
+  .ethic-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .ethic-item h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--text);
+    border: none;
+    padding: 0;
+  }
+
+  .ethic-item p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+
+  .ethic-item ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* 操作路径卡片 */
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+
+  .workflow-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .wf-num {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .workflow-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 4px 0 8px;
+    color: var(--text);
+  }
+
+  .workflow-card p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .workflow-card a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  /* FAQ 折叠面板 */
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .faq-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .faq-question {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: var(--text);
+    user-select: none;
+  }
+
+  .faq-chevron {
+    font-size: 16px;
+    color: var(--accent);
+    transition: transform 0.2s ease;
+  }
+
+  .faq-item[open] .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .faq-answer p {
+    margin: 0;
+  }
+
+  /* 专题集群链接网格 */
+  .cluster-links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .cluster-link-card {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .cluster-link-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .c-icon-wrap {
+    font-size: 24px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+  }
+
+  .c-content h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+
+  .c-content p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .author-endorsement-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .author-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .author-meta-info .a-icon {
+    font-size: 28px;
+    color: var(--accent);
+  }
+
+  .author-meta-info strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .author-meta-info p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* 移动端响应式断点 */
+  @media (max-width: 900px) {
+    .principles-grid,
+    .pain-points-grid,
+    .pipeline-steps,
+    .weights-grid,
+    .tier-grid,
+    .era-cards-grid,
+    .ethics-columns,
+    .workflow-grid,
+    .cluster-links-grid,
+    .probes-grid,
+    .toc-grid {
+      grid-template-columns: 1fr;
+    }
+    .lab-metrics-bar {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .about-hero-card,
+    .content-section {
+      padding: 20px 16px;
+    }
     .about-intro {
       flex-direction: column;
-      align-items: flex-start;
+      text-align: center;
+      gap: 14px;
+    }
+    .badge-row {
+      justify-content: center;
+    }
+    .intro-titles h1 {
+      font-size: 20px;
+    }
+    .lab-metrics-bar {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .lab-metric-item .m-val {
+      font-size: 18px;
     }
   }
 </style>

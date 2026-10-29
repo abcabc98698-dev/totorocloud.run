@@ -7,7 +7,7 @@ import {
   stripLanguage,
   useTranslations,
 } from "../i18n";
-import { getSiteInfo, getPersonalInfo } from "../config";
+import { getSiteInfo, getPersonalInfo, siteVerification } from "../config";
 import { getShareImage } from "../lib/avatar";
 import { OG_HEIGHT, OG_WIDTH, ogImagePath } from "../lib/og";
 import "../styles/global.css";
@@ -42,6 +42,15 @@ const t = useTranslations(lang);
 const siteInfo = getSiteInfo(lang);
 const personalInfo = getPersonalInfo(lang);
 const basePath = stripLanguage(Astro.url.pathname);
+const isMultiLangPage = (
+  basePath === "/" ||
+  basePath === "/about/" ||
+  basePath === "/projects/" ||
+  basePath === "/posts/" ||
+  basePath === "/posts/welcome/" ||
+  basePath === "/posts/writing-with-markdown/" ||
+  basePath === "/posts/a-weekend-in-the-mountains/"
+);
 const {
   title,
   description = siteInfo.description,
@@ -60,24 +69,31 @@ const homeUrl = absolute(localizePath(lang, "/"));
 const ogImage = absolute(ogImagePath(lang, article?.id));
 const ogImageAlt = title ?? siteInfo.titleSuffix;
 const avatarImage = absolute(await getShareImage());
+const pageKeywords = (
+  article
+    ? [...article.tags, ...(siteInfo.keywords ?? [])]
+    : (siteInfo.keywords ?? [])
+).join(", ");
 
 // One linked graph (https://schema.org) describing the site, its author,
 // this page, and, on posts, the article and its breadcrumb trail.
 const ids = {
-  person: `${absolute("/")}#person`,
+  organization: `${absolute("/")}#organization`,
   website: `${homeUrl}#website`,
   page: `${canonical}#webpage`,
 };
 const graph: Record<string, unknown>[] = [
   {
-    "@type": "Person",
-    "@id": ids.person,
+    "@type": "Organization",
+    "@id": ids.organization,
     name: personalInfo.name,
     alternateName: personalInfo.englishName,
-    jobTitle: personalInfo.role,
     url: absolute(localizePath(lang, "/about/")),
-    image: avatarImage,
-    sameAs: [personalInfo.github],
+    logo: {
+      "@type": "ImageObject",
+      url: avatarImage,
+    },
+    sameAs: [personalInfo.github].filter(Boolean),
   },
   {
     "@type": "WebSite",
@@ -87,7 +103,7 @@ const graph: Record<string, unknown>[] = [
     url: homeUrl,
     description: siteInfo.description,
     inLanguage: lang,
-    publisher: { "@id": ids.person },
+    publisher: { "@id": ids.organization },
   },
   {
     "@type": article ? "WebPage" : pageType,
@@ -98,7 +114,7 @@ const graph: Record<string, unknown>[] = [
     inLanguage: lang,
     isPartOf: { "@id": ids.website },
     primaryImageOfPage: { "@type": "ImageObject", url: ogImage },
-    ...(pageType === "ProfilePage" && { mainEntity: { "@id": ids.person } }),
+    ...(pageType === "ProfilePage" && { mainEntity: { "@id": ids.organization } }),
   },
 ];
 if (article) {
@@ -120,12 +136,12 @@ if (article) {
       datePublished: article.published.toISOString(),
       dateModified: article.modified.toISOString(),
       author: {
-        "@id": ids.person,
-        "@type": "Person",
+        "@id": ids.organization,
+        "@type": "Organization",
         name: personalInfo.name,
         url: absolute(localizePath(lang, "/about/")),
       },
-      publisher: { "@id": ids.person },
+      publisher: { "@id": ids.organization },
       inLanguage: lang,
       articleSection: article.section,
       keywords: article.tags,
@@ -171,7 +187,12 @@ const jsonLd = JSON.stringify({
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    {pageKeywords && <meta name="keywords" content={pageKeywords} />}
     <meta name="author" content={personalInfo.name} />
+    {siteVerification.google && <meta name="google-site-verification" content={siteVerification.google} />}
+    {siteVerification.bing && <meta name="msvalidate.01" content={siteVerification.bing} />}
+    {siteVerification.baidu && <meta name="baidu-site-verification" content={siteVerification.baidu} />}
+    {siteVerification.shenma && <meta name="shenma-site-verification" content={siteVerification.shenma} />}
     <meta
       name="robots"
       content={
@@ -191,7 +212,7 @@ const jsonLd = JSON.stringify({
       media="(prefers-color-scheme: dark)"
     />
     <link rel="canonical" href={canonical} />
-    {!noindex &&
+    {!noindex && isMultiLangPage &&
       languages.map((language) => (
         <link
           rel="alternate"
@@ -199,11 +220,18 @@ const jsonLd = JSON.stringify({
           href={absolute(localizePath(language, basePath))}
         />
       ))}
-    {!noindex && (
+    {!noindex && isMultiLangPage && (
       <link
         rel="alternate"
         hreflang="x-default"
         href={absolute(localizePath(defaultLanguage, basePath))}
+      />
+    )}
+    {!noindex && !isMultiLangPage && (
+      <link
+        rel="alternate"
+        hreflang={lang}
+        href={canonical}
       />
     )}
     <meta property="og:type" content={article ? "article" : "website"} />
@@ -212,7 +240,7 @@ const jsonLd = JSON.stringify({
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={siteInfo.locale} />
-    {languages
+    {isMultiLangPage && languages
       .filter((language) => language !== lang)
       .map((language) => (
         <meta
@@ -243,6 +271,8 @@ const jsonLd = JSON.stringify({
       </>
     )}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={personalInfo.name} />
+    <meta name="twitter:creator" content={personalInfo.name} />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />

@@ -1,6 +1,6 @@
 ---
-title: "Welcome to Grimorio"
-description: "A quick tour of this template: what's included, how it's meant to be used, and how to start writing your own posts."
+title: "Welcome to TotoroCloud"
+description: "An introduction to TotoroCloud: modern cloud architecture, engineering principles, and our technical knowledge base."
 date: 2026-03-15
 lang: en
 category: guides
@@ -8,24 +8,24 @@ tags: ["Astro", "Blogging"]
 featured: true
 ---
 
-If you're reading this, you've just set up **Grimorio**, a blog template built with Astro and designed for writing without fighting the tooling. This post is an example, like the other two that ship with it: delete them whenever you want and start with your own.
+Welcome to **TotoroCloud**. This engineering publication is dedicated to exploring scalable distributed systems, modern cloud infrastructure, and practical developer workflows.
 
-![A tidy desk next to a window](/covers/welcome.webp)
+![A tidy workspace with modern engineering equipment](/covers/welcome.webp)
 
-## What's included
+## Architecture and Focus
 
-The idea is that the important things are solved from minute one, so you only worry about writing:
+Our objective is to provide actionable technical insights and high-signal architectural references:
 
-- **Two languages** ready to go: English at `/` and Spanish at `/es/`, with a button to jump between them.
-- **Search** across the whole site with `Ctrl` / `⌘ + K`.
-- **Light and dark mode** that follows your system preference.
-- **Social images** generated for every post, with no design work on your part.
-- **SEO** handled: sitemap, RSS, metadata, and structured data.
+- **Bilingual documentation** designed for clear global communication.
+- **Instant full-text indexing** with keyboard-friendly shortcuts (`Ctrl` / `⌘ + K`).
+- **High-performance delivery** tuned for minimal latency and clean Core Web Vitals.
+- **Dynamic asset generation** for rich social previews and open graph distribution.
+- **Full SEO optimization** with automated sitemaps, semantic feeds, and structured schema graphs.
 
-## How to write
+## Engineering Standards
 
-Each post is a Markdown file inside `src/content/posts/`. You create the file, fill in four fields at the top (title, date, language, and category), and write. For the version in the other language, reuse the same file name in the other folder and the language button will link the two for you.
+Every article in this knowledge base is authored with clarity and depth. We focus on real-world engineering constraints, production benchmarks, and resilient system design.
 
-> Write first, tidy later. The template is here to remove friction, not to add steps.
+> Build resilient foundations first; scale with precision and measurable telemetry.
 
-Take a look at the **Writing with Markdown** post to see everything you can use inside a post, and change it all to your liking from `src/site.config.json`.
+Explore our technical guides, system architecture breakdowns, and dev notes across the publication.

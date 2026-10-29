@@ -1,0 +1,385 @@
+---
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import { PROXY_CLIENTS, PLATFORM_NAMES } from "../../data/clients";
+
+const title =
+  "2026 全平台翻墙客户端下载与使用教程大全 · Windows / Android / iOS / Mac / 软路由";
+const description =
+  "龙猫云实验室权威整理：Clash Verge Rev、v2rayN、Shadowrocket 小火箭、Stash、v2rayNG、FlClash 与 OpenClash 官方下载地址、内核协议支持与订阅导入保姆级图文教程。";
+
+const softwareListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "主流机场代理客户端汇总",
+  description: description,
+  itemListElement: PROXY_CLIENTS.map((c, i) => ({
+    "@type": "SoftwareApplication",
+    position: i + 1,
+    name: c.name,
+    operatingSystem: c.platforms.join(", "),
+    applicationCategory: "UtilitiesApplication",
+    description: c.tagline,
+    url: c.downloadUrl,
+  })),
+};
+---
+
+<BlogLayout
+  title={title}
+  description={description}
+  heroTitle="全平台客户端大全"
+  pageType="CollectionPage"
+>
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(softwareListSchema)}
+  />
+  <section class="clients-intro card">
+    <div class="intro-header">
+      <span class="eyebrow">CLIENTS ECOSYSTEM & TUTORIALS</span>
+      <h1>2026 全平台机场代理客户端推荐与配置指南</h1>
+      <p>
+        选择一款稳定、高效且适合自身操作习惯的代理客户端，是获得极致翻墙与跨境访问体验的关键。本专栏收录当前主流且持续维护的开源客户端，涵盖
+        Windows、macOS、iOS、Android、Linux 及 OpenWrt 软路由网关。
+      </p>
+    </div>
+
+    <div class="platform-nav">
+      <span class="nav-title">平台直达：</span>
+      <a href="#windows" class="p-link">
+        Windows 电脑
+      </a>
+      <a href="#android" class="p-link">
+        Android 安卓
+      </a>
+      <a href="#ios" class="p-link">
+        iPhone / iPad
+      </a>
+      <a href="#macos" class="p-link">
+        macOS 苹果
+      </a>
+      <a href="#openwrt" class="p-link">
+        OpenWrt 软路由
+      </a>
+    </div>
+  </section>
+
+  <!-- Clients List by Platform -->
+  <div class="clients-container">
+    {Object.entries(PLATFORM_NAMES).map(([platformKey, platformName]) => {
+      const platformClients = PROXY_CLIENTS.filter((c) =>
+        c.platforms.includes(platformKey as any),
+      );
+      if (!platformClients.length) return null;
+
+      return (
+        <section id={platformKey} class="platform-section card">
+          <div class="platform-head">
+            <h2>{platformName} 主流推荐客户端</h2>
+            <span class="badge">{platformClients.length} 款推荐</span>
+          </div>
+
+          <div class="clients-grid">
+            {platformClients.map((client) => (
+              <div class="client-card">
+                <div class="client-head">
+                  <div class="c-title">
+                    <h3>{client.name}</h3>
+                    <span class="core-tag">核心: {client.core}</span>
+                  </div>
+                  <span class="source-tag">{client.sourceType}</span>
+                </div>
+
+                <p class="tagline">{client.tagline}</p>
+
+                <ul class="pros-list">
+                  {client.pros.map((pro) => (
+                    <li>{pro}</li>
+                  ))}
+                </ul>
+
+                <div class="suit-for">
+                  <strong>推荐人群：</strong>
+                  {client.recommendedFor}
+                </div>
+
+                <div class="action-row">
+                  <a
+                    href={client.downloadUrl}
+                    target="_blank"
+                    rel="nofollow noopener"
+                    class="btn-dl"
+                  >
+                    下载 / 项目地址 ↗
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+
+  <!-- FAQ Section -->
+  <section class="card faq-card">
+    <h3>常见客户端配置问题 (FAQ)</h3>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>
+          <strong>Q: 什么是 TUN 模式？为什么推荐开启？</strong>
+        </summary>
+        <p>
+          TUN（Virtual Network
+          Terminal）模式会在操作系统中创建一个虚拟网卡，将整个系统的所有网络连接（包括命令行、游戏客户端、不遵守系统代理设置的软件）无条件接管并交由代理内核分流，能彻底杜绝
+          DNS 泄漏并实现真全局代理。
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <strong>Q: iPhone / iPad 如何下载 Shadowrocket (小火箭)？</strong>
+        </summary>
+        <p>
+          因大陆地区 App Store
+          政策限制，需准备一个非国区（如美区、日区、港区）的 Apple ID，登录 App
+          Store 后搜索并购买下载。请勿使用来路不明的公共共享账号登录
+          iCloud，谨防设备锁死。
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <strong>Q: 订阅链接导入失败或更新超时怎么处理？</strong>
+        </summary>
+        <p>
+          通常由于本地运营商对机场订阅域名产生 DNS
+          污染。可在客户端设置中开启“允许不安全连接”、手动更换公共 DNS（如
+          223.5.5.5 或
+          119.29.29.29），或通过机场后台复制单节点节点链接进行应急导入。
+        </p>
+      </details>
+    </div>
+  </section>
+</BlogLayout>
+
+<style>
+  .clients-intro {
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+
+  .intro-header .eyebrow {
+    display: block;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .intro-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    line-height: 1.3;
+  }
+
+  .intro-header p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .platform-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+  }
+
+  .nav-title {
+    color: var(--muted);
+  }
+
+  .p-link {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .p-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .clients-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .platform-section {
+    padding: 24px 28px;
+  }
+
+  .platform-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .platform-head h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .platform-head .badge {
+    font-size: 12px;
+    background: #1e2530;
+    color: #38bdf8;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .client-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .client-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .c-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .core-tag {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .source-tag {
+    font-size: 11px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .pros-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .suit-for {
+    font-size: 12px;
+    color: #94a3b8;
+    background: #111418;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border-left: 3px solid #38bdf8;
+  }
+
+  .suit-for strong {
+    color: #f1f5f9;
+  }
+
+  .action-row {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .btn-dl {
+    background: var(--accent);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .faq-card {
+    padding: 24px 28px;
+    margin-top: 20px;
+  }
+
+  .faq-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .faq-item {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 18px;
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .faq-item p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 10px 0 0;
+  }
+</style>
